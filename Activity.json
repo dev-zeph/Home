@@ -1,0 +1,163 @@
+{
+  "project": "NG Rentals MVP",
+  "created": "2025-08-18T00:00:00Z",
+  "activities": [
+    {
+      "id": "001",
+      "timestamp": "2025-08-18T00:00:00Z",
+      "action": "PROJECT_INITIALIZATION",
+      "description": "Initial project setup with Create React App frontend structure",
+      "details": {
+        "type": "setup",
+        "technology_stack": ["React 19.1.1", "Create React App"],
+        "files_created": [
+          "frontend/package.json",
+          "frontend/src/App.js",
+          "frontend/src/index.js",
+          "frontend/public/index.html"
+        ],
+        "notes": "Basic React structure created, but spec calls for Gatsby + Carbon theme"
+      },
+      "status": "completed",
+      "next_action": "Need to migrate to Gatsby or continue with React and add required dependencies"
+    },
+    {
+      "id": "002",
+      "timestamp": "2025-08-18T14:30:00Z",
+      "action": "ARCHITECTURE_DECISION",
+      "description": "Decision to use Create React App with Carbon Design System instead of Gatsby + Carbon theme",
+      "details": {
+        "type": "architecture",
+        "decision": "Use CRA + Carbon styling instead of Gatsby theme",
+        "rationale": "Simpler setup while still leveraging Carbon design system",
+        "impact": "Will need to implement SSR differently for listing pages",
+        "next_steps": [
+          "Install Carbon Design System packages",
+          "Set up Carbon theme and components",
+          "Configure routing structure",
+          "Implement authentication system"
+        ]
+      },
+      "status": "completed",
+      "next_action": "Install and configure Carbon Design System"
+    },
+    {
+      "id": "003",
+      "timestamp": "2025-08-18T14:45:00Z",
+      "action": "CARBON_DESIGN_SYSTEM_SETUP",
+      "description": "Installed and configured Carbon Design System with React components",
+      "details": {
+        "type": "frontend_setup",
+        "packages_installed": [
+          "@carbon/react",
+          "@carbon/styles", 
+          "@carbon/icons-react",
+          "react-router-dom",
+          "react-hook-form",
+          "zod",
+          "@hookform/resolvers",
+          "@tanstack/react-query",
+          "axios"
+        ],
+        "files_modified": [
+          "frontend/src/index.css",
+          "frontend/src/App.js",
+          "frontend/src/App.css"
+        ],
+        "files_created": [
+          "frontend/src/pages/Home.js",
+          "frontend/src/pages/Listings.js", 
+          "frontend/src/pages/ListingDetail.js",
+          "frontend/src/pages/Dashboard.js"
+        ],
+        "features_implemented": [
+          "Landing page with Carbon styling",
+          "Property listings page with filters",
+          "Listing detail page with image gallery",
+          "Dashboard with navigation",
+          "React Router setup",
+          "Responsive design"
+        ]
+      },
+      "status": "completed",
+      "next_action": "Set up backend API with NestJS"
+    },
+    {
+      "id": "004",
+      "timestamp": "2025-08-18T15:00:00Z",
+      "action": "BUG_FIX",
+      "description": "Fixed DocumentText icon import error in Dashboard component",
+      "details": {
+        "type": "bug_fix",
+        "issue": "DocumentText icon not found in @carbon/icons-react library",
+        "solution": "Replaced DocumentText with Document icon",
+        "files_modified": [
+          "frontend/src/pages/Dashboard.js"
+        ],
+        "error_resolved": "webpack compiled with 1 error and 1 warning -> clean compilation"
+      },
+      "status": "completed",
+      "next_action": "Set up backend API with NestJS"
+    },
+    {
+      "id": "005",
+      "timestamp": "2025-08-18T15:15:00Z",
+      "action": "HOMEPAGE_REDESIGN",
+      "description": "Updated homepage to use Welcome.jpg as background with transparent button",
+      "details": {
+        "type": "ui_enhancement",
+        "changes": [
+          "Added Welcome.jpg as background image for hero section",
+          "Removed hero text and description",
+          "Made search button transparent with white border",
+          "Added overlay for better text readability",
+          "Improved responsive design with min-height"
+        ],
+        "files_modified": [
+          "frontend/src/pages/Home.js",
+          "frontend/src/App.css"
+        ],
+        "visual_improvements": [
+          "Hero section now uses background image",
+          "Transparent button with hover effects",
+          "Dark overlay for better contrast",
+          "Centered button layout"
+        ]
+      },
+      "status": "completed",
+      "next_action": "Set up backend API with NestJS"
+    },
+    {
+      "id": "006",
+      "timestamp": "2025-08-18T15:20:00Z",
+      "action": "BUILD_FIXES",
+      "description": "Fixed image path resolution and removed unused imports to resolve compilation errors",
+      "details": {
+        "type": "bug_fix",
+        "issues_resolved": [
+          "Module not found error for Welcome.jpg image path",
+          "ESLint warnings for unused imports (Heading, Loading)"
+        ],
+        "changes": [
+          "Corrected background-image URL path in CSS",
+          "Removed unused Heading import from Home.js",
+          "Removed unused Loading import from Listings.js"
+        ],
+        "files_modified": [
+          "frontend/src/App.css",
+          "frontend/src/pages/Home.js",
+          "frontend/src/pages/Listings.js"
+        ],
+        "result": "Clean compilation without errors or warnings"
+      },
+      "status": "completed",
+      "next_action": "Set up backend API with NestJS"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-08-18T15:20:00Z",
+    "total_activities": 6,
+    "current_phase": "frontend_implementation",
+    "specification_reference": "ProjectOverView.md sections 1-13"
+  }
+}

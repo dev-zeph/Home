@@ -1,0 +1,379 @@
+/* Landing Page Styles */
+.landing-page {
+  padding: 2rem 0;
+}
+
+.landing-page__banner {
+  padding: 3rem 1rem;
+  text-align: center;
+  background-image: url('images/Home.jpg'); /* Ensure the path is correct */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  margin-bottom: 2rem;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.landing-page__banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.search-properties-btn {
+  background: transparent !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  color: white !important;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.search-properties-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: white !important;
+  transform: translateY(-2px);
+}
+
+/* Feature Grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card h3 {
+  margin: 1rem 0 0.5rem 0;
+  color: #161616;
+}
+
+/* Listings Page */
+.listings-page {
+  padding: 1rem 0;
+}
+
+.filters-panel {
+  background: #f4f4f4;
+  padding: 1.5rem;
+  border-radius: 8px;
+  position: sticky;
+  top: 1rem;
+}
+
+.filters-panel h3 {
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.filters-panel .cds--select,
+.filters-panel .cds--number-input,
+.filters-panel .cds--search {
+  margin-bottom: 1rem;
+}
+
+.listings-results {
+  padding-left: 1rem;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.listing-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+}
+
+.listing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.listing-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.verified-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.listing-content h4 {
+  margin-bottom: 0.5rem;
+  color: #161616;
+}
+
+.listing-price {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f62fe;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.listing-location {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #525252;
+  margin-bottom: 1rem;
+}
+
+.listing-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #525252;
+}
+
+/* Listing Detail Page */
+.listing-detail {
+  padding: 1rem 0;
+}
+
+.image-gallery {
+  margin-bottom: 2rem;
+}
+
+.main-image {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.main-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.thumbnail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.thumbnail-gallery img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.virtual-tour {
+  margin: 2rem 0;
+}
+
+.tour-embed {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.property-details {
+  margin-top: 2rem;
+}
+
+.property-details h2 {
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.description {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #525252;
+}
+
+.amenities h4 {
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.amenities-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Sidebar */
+.listing-sidebar {
+  position: sticky;
+  top: 1rem;
+}
+
+.price-section {
+  background: #f4f4f4;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.price .amount {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0f62fe;
+}
+
+.price .period {
+  font-size: 1rem;
+  color: #525252;
+}
+
+.deposit {
+  color: #525252;
+  margin: 0;
+}
+
+.property-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.plus-code {
+  background: #e8f4fd;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.property-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.property-stats span {
+  background: #f4f4f4;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.contact-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+}
+
+.contact-section h4 {
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.apply-section button {
+  background: #198038;
+}
+
+.map-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.map-section h4 {
+  margin-bottom: 1rem;
+  color: #161616;
+}
+
+.map-placeholder {
+  background: #f4f4f4;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 4px;
+  color: #525252;
+}
+
+/* Dashboard */
+.dashboard {
+  min-height: calc(100vh - 3rem);
+}
+
+.dashboard-content {
+  padding: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .landing-page__heading {
+    font-size: 2rem;
+  }
+  
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .thumbnail-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
