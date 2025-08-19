@@ -152,12 +152,208 @@
       },
       "status": "completed",
       "next_action": "Set up backend API with NestJS"
+    },
+    {
+      "id": "007",
+      "timestamp": "2025-08-18T15:30:00Z",
+      "action": "HOMEPAGE_INTEGRATION",
+      "description": "Integrated search properties functionality into homepage with smooth scrolling navigation",
+      "details": {
+        "type": "feature_enhancement",
+        "changes": [
+          "Added search properties section to homepage",
+          "Implemented smooth scrolling from hero section to search",
+          "Updated navigation to scroll to search section instead of separate page",
+          "Added property listings display with filters",
+          "Integrated search functionality with mock data"
+        ],
+        "files_modified": [
+          "frontend/src/pages/Home.js",
+          "frontend/src/App.js",
+          "frontend/src/App.css"
+        ],
+        "features_added": [
+          "Search and filter panel",
+          "Property listings grid",
+          "Smooth scroll navigation",
+          "Mock property data display",
+          "Responsive search section layout"
+        ],
+        "user_experience": "Single page experience with hero section and property search"
+      },
+      "status": "completed",
+      "next_action": "Set up backend API with NestJS"
+    },
+    {
+      "id": "008",
+      "timestamp": "2025-08-18T15:45:00Z",
+      "action": "ARCHITECTURE_UPDATE",
+      "description": "Updated backend architecture to use Supabase instead of custom NestJS API",
+      "details": {
+        "type": "architecture",
+        "decision": "Use Supabase for authentication and database instead of NestJS + PostgreSQL",
+        "rationale": "Faster MVP development, built-in auth, real-time features, hosted database",
+        "impact": "Simpler backend setup, faster development, built-in security",
+        "next_steps": [
+          "Install Supabase client library",
+          "Set up Supabase project and configure database schema",
+          "Implement authentication with Supabase Auth",
+          "Create database tables and seed data",
+          "Integrate frontend with Supabase"
+        ]
+      },
+      "status": "completed",
+      "next_action": "Set up Supabase integration"
+    },
+    {
+      "id": "009",
+      "timestamp": "2025-08-18T16:00:00Z",
+      "action": "SUPABASE_INTEGRATION_SETUP",
+      "description": "Implemented complete Supabase integration with authentication, database schema, and frontend components",
+      "details": {
+        "type": "backend_integration",
+        "components_created": [
+          "Supabase client configuration",
+          "Authentication context and hooks",
+          "Auth modal component with login/signup",
+          "Database schema with all required tables",
+          "Seed data with sample properties",
+          "Row-level security policies"
+        ],
+        "files_created": [
+          "frontend/src/lib/supabase.js",
+          "frontend/src/contexts/AuthContext.js",
+          "frontend/src/components/AuthModal.js",
+          "frontend/.env.example",
+          "supabase_schema.sql",
+          "supabase_seed.sql"
+        ],
+        "files_modified": [
+          "frontend/src/App.js",
+          "frontend/package.json"
+        ],
+        "features_implemented": [
+          "JWT-based authentication with roles",
+          "User registration and login",
+          "Protected routes and role-based access",
+          "Database schema matching specification",
+          "Sample data with Lagos/Abuja Plus Codes",
+          "Responsive auth modal",
+          "User context throughout app"
+        ],
+        "database_tables": [
+          "users", "owner_profiles", "properties", "media", 
+          "applications", "leases", "invoices", "payments",
+          "message_threads", "messages", "audit_logs"
+        ]
+      },
+      "status": "completed",
+      "next_action": "Configure Supabase project and connect frontend to real data"
+    },
+    {
+      "id": "010",
+      "timestamp": "2025-08-18T17:00:00Z",
+      "action": "BUILD_FIXES_AND_SUPABASE_INTEGRATION",
+      "description": "Fixed build errors and connected frontend to real Supabase data",
+      "details": {
+        "type": "integration",
+        "build_fixes": [
+          "Fixed .env variable names from NEXT_PUBLIC_ to REACT_APP_ for CRA compatibility",
+          "Fixed Welcome.jpg path issue by replacing with CSS gradient background",
+          "Removed unused variables from App.js and AuthModal.js to fix ESLint warnings"
+        ],
+        "supabase_integration": [
+          "Created propertyService.js for all property CRUD operations",
+          "Updated Home.js to fetch real data from Supabase instead of mock data",
+          "Added loading states, error handling, and proper data mapping",
+          "Connected search filters to Supabase queries with real-time filtering"
+        ],
+        "files_modified": [
+          "frontend/.env",
+          "frontend/src/App.css",
+          "frontend/src/App.js", 
+          "frontend/src/components/AuthModal.js",
+          "frontend/src/pages/Home.js"
+        ],
+        "files_created": [
+          "frontend/src/services/propertyService.js"
+        ],
+        "data_flow": "Frontend now pulls property listings from Supabase 'properties' table with proper filtering and error handling"
+      },
+      "impact": "HIGH",
+      "status": "completed",
+      "next_action": "Test end-to-end functionality with real Supabase data and implement remaining CRUD operations"
+    },
+    {
+      "id": "011",
+      "timestamp": "2025-08-18T18:00:00Z",
+      "action": "DATABASE_SCHEMA_FINALIZATION",
+      "description": "Finalized Supabase database schema and seed data to match frontend implementation",
+      "details": {
+        "type": "database",
+        "changes": [
+          "Updated properties table: owner_id -> user_id, price_ngn -> price, type -> property_type, beds -> bedrooms, baths -> bathrooms, published -> status",
+          "Renamed media table to property_media and kind -> type",
+          "Added state field to properties for better location filtering",
+          "Updated all RLS policies to match new field names",
+          "Modified seed data to include Lagos State and FCT state fields",
+          "Created comprehensive setup guide (SUPABASE_SETUP.md)"
+        ],
+        "files_modified": [
+          "supabase_schema.sql",
+          "supabase_seed.sql",
+          "SUPABASE_SETUP.md"
+        ],
+        "database_structure": {
+          "tables": ["users", "owner_profiles", "properties", "property_media", "applications", "leases", "invoices", "payments", "message_threads", "messages", "audit_logs"],
+          "security": "Row Level Security enabled on all tables",
+          "storage": "property-media bucket for image/video uploads",
+          "indexes": "Optimized for city, state, property_type, price filtering"
+        }
+      },
+      "impact": "CRITICAL",
+      "status": "completed",
+      "next_action": "Execute schema and seed scripts in Supabase dashboard, test database connection from frontend"
+    },
+    {
+      "id": "012",
+      "timestamp": "2025-08-18T19:00:00Z",
+      "action": "AUTHENTICATION_ENHANCEMENT",
+      "description": "Implemented comprehensive authentication flow with dedicated login/signup pages and improved navbar",
+      "details": {
+        "type": "frontend_authentication",
+        "changes": [
+          "Created dedicated Login page (/login) with Carbon Design System form components",
+          "Created dedicated Signup page (/signup) with role selection and validation",
+          "Updated App.js routing to include login/signup routes",
+          "Enhanced navbar: Login/Signup buttons for unauthenticated users, Dashboard link for authenticated users",
+          "Fixed AuthContext to properly use Supabase Auth API (signUp, signInWithPassword, signOut)",
+          "Removed legacy AuthModal in favor of dedicated pages",
+          "Added proper form validation and error handling",
+          "Implemented user role selection (tenant/owner) during signup"
+        ],
+        "files_modified": [
+          "src/pages/Login.js",
+          "src/pages/Signup.js",
+          "src/App.js",
+          "src/contexts/AuthContext.js"
+        ],
+        "user_flow": {
+          "unauthenticated": "Homepage → Login/Signup buttons in navbar → Dedicated auth pages → Post-auth redirect to homepage/dashboard",
+          "authenticated": "Homepage → Dashboard link in navbar + User icon + Logout option",
+          "signup_process": "Signup page → Email verification → Login → Dashboard access"
+        },
+        "integration": "Authentication data stored in Supabase auth.users table with custom metadata (role, display_name, phone)"
+      },
+      "impact": "HIGH",
+      "status": "completed",
+      "next_action": "Test complete authentication flow with real Supabase database and implement property CRUD for authenticated users"
     }
   ],
   "metadata": {
-    "last_updated": "2025-08-18T15:20:00Z",
-    "total_activities": 6,
-    "current_phase": "frontend_implementation",
+    "last_updated": "2025-08-18T19:00:00Z",
+    "total_activities": 12,
+    "current_phase": "authentication_complete",
     "specification_reference": "ProjectOverView.md sections 1-13"
   }
 }

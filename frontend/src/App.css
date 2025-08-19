@@ -6,10 +6,7 @@
 .landing-page__banner {
   padding: 3rem 1rem;
   text-align: center;
-  background-image: url('images/Home.jpg'); /* Ensure the path is correct */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #0f62fe 0%, #002d9c 100%);
   color: white;
   margin-bottom: 2rem;
   min-height: 60vh;
@@ -64,6 +61,23 @@
 .feature-card h3 {
   margin: 1rem 0 0.5rem 0;
   color: #161616;
+}
+
+/* Search Properties Section */
+.search-properties-section {
+  padding: 4rem 1rem 2rem 1rem;
+  background: #f8f9fa;
+}
+
+.search-properties-section h2 {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #161616;
+  font-size: 2.5rem;
+}
+
+.search-content {
+  margin-top: 2rem;
 }
 
 /* Listings Page */
