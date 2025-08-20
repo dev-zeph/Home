@@ -34,6 +34,20 @@ export const AuthProvider = ({ children }) => {
   const signUp = async (email, password, userData = {}) => {
     try {
       setLoading(true)
+      
+      // First check if username is already taken
+      if (userData.username) {
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('username')
+          .eq('username', userData.username)
+          .single()
+        
+        if (existingUser) {
+          throw new Error('Username is already taken')
+        }
+      }
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -41,12 +55,33 @@ export const AuthProvider = ({ children }) => {
           data: {
             role: userData.role || 'tenant',
             display_name: userData.displayName || '',
+            username: userData.username || '',
             phone: userData.phone || ''
           }
         }
       })
       
       if (error) throw error
+      
+      // If signup successful and we have a user, create the profile
+      if (data.user && userData.username) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            display_name: userData.displayName || '',
+            username: userData.username,
+            phone: userData.phone || '',
+            role: userData.role || 'tenant'
+          })
+        
+        if (profileError) {
+          console.error('Error creating user profile:', profileError)
+          // Don't throw here as the auth user was created successfully
+        }
+      }
+      
       return { data, error: null }
     } catch (error) {
       return { data: null, error }

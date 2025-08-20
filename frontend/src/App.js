@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { 
   Header, 
@@ -20,15 +20,38 @@ import './App.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import PostProperty from './pages/PostProperty';
 import Listings from './pages/Listings';
 import ListingDetail from './pages/ListingDetail';
 import Dashboard from './pages/Dashboard';
+import Lagos from './pages/Lagos';
+import Abuja from './pages/Abuja';
+import Calabar from './pages/Calabar';
+import PortHarcourt from './pages/PortHarcourt';
+import Kano from './pages/Kano';
+import Ibadan from './pages/Ibadan';
 
 // Create a client for React Query
 const queryClient = new QueryClient();
 
 const AppHeader = () => {
   const { signOut, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/'); // Redirect to homepage after logout
+  };
+
+  const handleSearchPropertiesClick = () => {
+    // If we're not on the homepage, navigate there first
+    if (window.location.pathname !== '/') {
+      navigate('/', { state: { scrollToSearch: true } });
+    } else {
+      // If we're already on homepage, just scroll
+      scrollToSearch();
+    }
+  };
 
   const scrollToSearch = () => {
     const searchSection = document.getElementById('search-section');
@@ -50,13 +73,18 @@ const AppHeader = () => {
           <HeaderMenuItem as={Link} to="/">
             Home
           </HeaderMenuItem>
-          <HeaderMenuItem onClick={scrollToSearch} style={{cursor: 'pointer'}}>
+          <HeaderMenuItem onClick={handleSearchPropertiesClick} style={{cursor: 'pointer'}}>
             Search Properties
           </HeaderMenuItem>
           {isAuthenticated && (
-            <HeaderMenuItem as={Link} to="/dashboard">
-              Dashboard
-            </HeaderMenuItem>
+            <>
+              <HeaderMenuItem as={Link} to="/dashboard">
+                Dashboard
+              </HeaderMenuItem>
+              <HeaderMenuItem as={Link} to="/post-property">
+                Post Property
+              </HeaderMenuItem>
+            </>
           )}
         </HeaderNavigation>
         <HeaderGlobalBar>
@@ -70,7 +98,7 @@ const AppHeader = () => {
               </HeaderGlobalAction>
               <HeaderGlobalAction 
                 aria-label="Sign out"
-                onClick={signOut}
+                onClick={handleSignOut}
                 tooltipAlignment="end"
               >
                 <Logout size={20} />
@@ -117,9 +145,16 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/post-property" element={<PostProperty />} />
                   <Route path="/listings" element={<Listings />} />
                   <Route path="/listings/:id" element={<ListingDetail />} />
                   <Route path="/dashboard/*" element={<Dashboard />} />
+                  <Route path="/cities/lagos" element={<Lagos />} />
+                  <Route path="/cities/abuja" element={<Abuja />} />
+                  <Route path="/cities/calabar" element={<Calabar />} />
+                  <Route path="/cities/port-harcourt" element={<PortHarcourt />} />
+                  <Route path="/cities/kano" element={<Kano />} />
+                  <Route path="/cities/ibadan" element={<Ibadan />} />
                 </Routes>
               </Content>
             </div>

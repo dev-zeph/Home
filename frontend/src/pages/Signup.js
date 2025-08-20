@@ -18,6 +18,7 @@ import { useAuth } from '../contexts/AuthContext';
 const Signup = () => {
   const [formData, setFormData] = useState({
     displayName: '',
+    username: '',
     email: '',
     phone: '',
     password: '',
@@ -55,7 +56,19 @@ const Signup = () => {
       return false;
     }
     if (!formData.displayName.trim()) {
-      setError('Display name is required');
+      setError('Full name is required');
+      return false;
+    }
+    if (!formData.username.trim()) {
+      setError('Username is required');
+      return false;
+    }
+    if (formData.username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      return false;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      setError('Username can only contain letters, numbers, and underscores');
       return false;
     }
     return true;
@@ -78,6 +91,7 @@ const Signup = () => {
         formData.password, 
         {
           displayName: formData.displayName,
+          username: formData.username,
           phone: formData.phone,
           role: formData.role
         }
@@ -138,6 +152,19 @@ const Signup = () => {
                     value={formData.displayName}
                     onChange={handleChange}
                     required
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <TextInput
+                    id="username"
+                    name="username"
+                    labelText="Username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                    helperText="3+ characters, letters, numbers, and underscores only"
+                    placeholder="e.g., property_pro_lagos"
                   />
                 </div>
 

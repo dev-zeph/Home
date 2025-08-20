@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Grid, 
   Column, 
@@ -12,10 +13,19 @@ import {
   Tag,
   Loading
 } from '@carbon/react';
-import { Search as SearchIcon, ArrowRight, Location, Currency } from '@carbon/icons-react';
+import { Search as SearchIcon, ArrowRight, Location, Currency, Add } from '@carbon/icons-react';
 import { propertyService } from '../services/propertyService';
+import { useAuth } from '../contexts/AuthContext';
+import LagosImage from '../images/Lagos.jpg';
+import AbujaImage from '../images/Abuja.jpg';
+import CalabarImage from '../images/Calabar.jpg';
+import PortHarcourtImage from '../images/port-harcourt.jpg';
+import KanoImage from '../images/Kano.jpg';
+import IbadanImage from '../images/Ibadan.jpg';
 
 const Home = () => {
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     city: '',
@@ -40,6 +50,21 @@ const Home = () => {
       handleSearch();
     }
   }, [filters]);
+
+  // Handle scroll to search section when navigating from other pages
+  useEffect(() => {
+    if (location.state?.scrollToSearch) {
+      setTimeout(() => {
+        const searchSection = document.getElementById('search-section');
+        if (searchSection) {
+          searchSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 100); // Small delay to ensure the page has rendered
+    }
+  }, [location]);
 
   const fetchProperties = async () => {
     try {
@@ -101,6 +126,24 @@ const Home = () => {
             Search Properties
           </Button>
         </Column>
+
+        {/* Post Property CTA for Authenticated Users */}
+        {isAuthenticated && (
+          <Column lg={16} md={8} sm={4} style={{ padding: '2rem 1rem', textAlign: 'center', backgroundColor: '#e8f4fd' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Have a property to rent?</h3>
+            <p style={{ marginBottom: '1.5rem', color: '#525252' }}>
+              List your property on NG Rentals and reach thousands of potential tenants.
+            </p>
+            <Button 
+              as={Link}
+              to="/post-property"
+              renderIcon={Add}
+              size="lg"
+            >
+              Post Your Property
+            </Button>
+          </Column>
+        )}
         
         <Column lg={16} md={8} sm={4} className="landing-page__features">
           <div className="feature-grid">
@@ -120,6 +163,88 @@ const Home = () => {
           </div>
         </Column>
 
+        {/* Rest Assured Section */}
+        <Column lg={16} md={8} sm={4} className="rest-assured-section">
+          <div className="rest-assured-content">
+            <h2>Rest Assured</h2>
+            <p>
+              Every property listed on NG Rentals undergoes thorough physical verification by our 
+              professional home.ng agents. We personally visit each property to ensure accurate 
+              descriptions, verify amenities, and confirm the legitimacy of listings. Your safety 
+              and trust are our top priorities, so you can browse and apply with complete confidence.
+            </p>
+          </div>
+        </Column>
+
+        {/* Explore Nigeria Section */}
+        <Column lg={16} md={8} sm={4} className="explore-nigeria-section">
+          <div className="explore-nigeria-content">
+            <h2>Explore Nigeria</h2>
+            <p>Discover amazing rental properties in Nigeria's most vibrant cities</p>
+            
+            <div className="cities-grid">
+              <Link to="/cities/lagos" className="city-card">
+                <div className="city-image">
+                  <img src={LagosImage} alt="Lagos skyline" />
+                  <div className="city-overlay">
+                    <h3>Lagos</h3>
+                    <p>Commercial Capital</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/cities/abuja" className="city-card">
+                <div className="city-image">
+                  <img src={AbujaImage} alt="Abuja cityscape" />
+                  <div className="city-overlay">
+                    <h3>Abuja</h3>
+                    <p>Federal Capital Territory</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/cities/calabar" className="city-card">
+                <div className="city-image">
+                  <img src={CalabarImage} alt="Calabar waterfront" />
+                  <div className="city-overlay">
+                    <h3>Calabar</h3>
+                    <p>Tourism Capital</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/cities/port-harcourt" className="city-card">
+                <div className="city-image">
+                  <img src={PortHarcourtImage} alt="Port Harcourt" />
+                  <div className="city-overlay">
+                    <h3>Port Harcourt</h3>
+                    <p>Oil Capital</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/cities/kano" className="city-card">
+                <div className="city-image">
+                  <img src={KanoImage} alt="Kano" />
+                  <div className="city-overlay">
+                    <h3>Kano</h3>
+                    <p>Ancient Commercial Hub</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/cities/ibadan" className="city-card">
+                <div className="city-image">
+                  <img src={IbadanImage} alt="Ibadan" />
+                  <div className="city-overlay">
+                    <h3>Ibadan</h3>
+                    <p>Educational Center</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </Column>
 
         {/* Search Properties Section */}
         <Column lg={16} md={8} sm={4} id="search-section" className="search-properties-section">
