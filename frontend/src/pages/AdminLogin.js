@@ -9,7 +9,8 @@ import {
   Button,
   InlineNotification,
   Loading,
-  Tile
+  Tile,
+  Man
 } from '@carbon/react';
 import { Login, Security } from '@carbon/icons-react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
