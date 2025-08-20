@@ -6,7 +6,8 @@ import {
   Button,
   Tag,
   Breadcrumb,
-  BreadcrumbItem
+  BreadcrumbItem,
+  Loading
 } from '@carbon/react';
 import { Location, Currency, Email, Phone } from '@carbon/icons-react';
 
