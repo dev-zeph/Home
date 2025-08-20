@@ -14,10 +14,5 @@
       "src": "/(.*)",
       "dest": "/frontend/$1"
     }
-  ],
-  "functions": {
-    "frontend/build/static/js/*.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
