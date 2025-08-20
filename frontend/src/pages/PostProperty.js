@@ -13,6 +13,7 @@ import {
   Tile,
   Heading,
   InlineNotification,
+  ToastNotification,
   FileUploader,
   Toggle,
   MultiSelect
@@ -26,6 +27,7 @@ const PostProperty = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -167,7 +169,8 @@ const PostProperty = () => {
         }
       }
 
-      setSuccess('Property posted successfully! It will be reviewed by our team before going live.');
+      setSuccess('Property submitted successfully! 🎉 Your listing has been sent for review by our verification officers. You will receive an email notification once it has been approved and goes live on the platform.');
+      setShowToast(true);
       
       // Reset form
       setFormData({
@@ -187,10 +190,19 @@ const PostProperty = () => {
       });
       setSelectedFiles([]);
 
-      // Redirect to dashboard after success
+      // Hide toast after 4 seconds
       setTimeout(() => {
-        navigate('/dashboard');
-      }, 3000);
+        setShowToast(false);
+      }, 4000);
+
+      // Redirect to dashboard after success with a longer delay to show the message
+      setTimeout(() => {
+        navigate('/dashboard', { 
+          state: { 
+            message: 'Property submitted for verification! Check your dashboard to track its status.' 
+          } 
+        });
+      }, 5000); // Increased to 5 seconds to give user time to read
 
     } catch (err) {
       setError('Failed to post property: ' + err.message);
@@ -206,6 +218,25 @@ const PostProperty = () => {
 
   return (
     <div style={{ padding: '2rem 0', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
+      {/* Toast Notification */}
+      {showToast && (
+        <div style={{ 
+          position: 'fixed', 
+          top: '100px', 
+          right: '20px', 
+          zIndex: 9999,
+          maxWidth: '400px'
+        }}>
+          <ToastNotification
+            kind="success"
+            title="Property Submitted! 🎉"
+            subtitle="Your listing is now being reviewed by our verification team. You'll be notified once it's approved!"
+            timeout={4000}
+            onCloseButtonClick={() => setShowToast(false)}
+          />
+        </div>
+      )}
+
       <Grid>
         <Column sm={4} md={8} lg={12} xlg={12} max={16}>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>

@@ -1,19 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { 
-  Header, 
-  HeaderName, 
-  HeaderNavigation, 
+import {
+  Grid,
+  Column,
+  Header,
+  HeaderName,
+  HeaderNavigation,
   HeaderMenuItem,
   HeaderGlobalBar,
   HeaderGlobalAction,
   Content,
   Theme,
-  Button
+  Button,
+  Loading
 } from '@carbon/react';
 import { User, Logout } from '@carbon/icons-react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AdminAuthProvider } from './contexts/AdminAuthContext';
 import './App.css';
 
 // Import pages
@@ -31,12 +35,63 @@ import PortHarcourt from './pages/PortHarcourt';
 import Kano from './pages/Kano';
 import Ibadan from './pages/Ibadan';
 
+// Import admin pages
+import AdminLogin from './pages/AdminLogin';
+import AdminSignup from './pages/AdminSignup';
+import AdminDashboard from './pages/AdminDashboard';
+
 // Create a client for React Query
 const queryClient = new QueryClient();
 
+// Wrapper component to handle loading state
+const AppContent = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <Loading description="Loading NG Rentals..." />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <AppHeader />
+      <Content>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/post-property" element={<PostProperty />} />
+          <Route path="/listings" element={<Listings />} />
+          <Route path="/property/:id" element={<ListingDetail />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/cities/lagos" element={<Lagos />} />
+          <Route path="/cities/abuja" element={<Abuja />} />
+          <Route path="/cities/calabar" element={<Calabar />} />
+          <Route path="/cities/port-harcourt" element={<PortHarcourt />} />
+          <Route path="/cities/kano" element={<Kano />} />
+          <Route path="/cities/ibadan" element={<Ibadan />} />
+        </Routes>
+      </Content>
+    </>
+  );
+};
+
 const AppHeader = () => {
-  const { signOut, isAuthenticated } = useAuth();
+  const { signOut, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Don't render header while loading
+  if (loading) {
+    return null;
+  }
 
   const handleSignOut = async () => {
     await signOut();
@@ -138,25 +193,21 @@ function App() {
         <Theme theme="white">
           <Router>
             <div className="App">
-              <AppHeader />
-              
-              <Content>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/post-property" element={<PostProperty />} />
-                  <Route path="/listings" element={<Listings />} />
-                  <Route path="/listings/:id" element={<ListingDetail />} />
-                  <Route path="/dashboard/*" element={<Dashboard />} />
-                  <Route path="/cities/lagos" element={<Lagos />} />
-                  <Route path="/cities/abuja" element={<Abuja />} />
-                  <Route path="/cities/calabar" element={<Calabar />} />
-                  <Route path="/cities/port-harcourt" element={<PortHarcourt />} />
-                  <Route path="/cities/kano" element={<Kano />} />
-                  <Route path="/cities/ibadan" element={<Ibadan />} />
-                </Routes>
-              </Content>
+              <Routes>
+                {/* Admin routes - wrapped with AdminAuthProvider only */}
+                <Route path="/admin/*" element={
+                  <AdminAuthProvider>
+                    <Routes>
+                      <Route path="/login" element={<AdminLogin />} />
+                      <Route path="/signup" element={<AdminSignup />} />
+                      <Route path="/dashboard" element={<AdminDashboard />} />
+                    </Routes>
+                  </AdminAuthProvider>
+                } />
+                
+                {/* Main app routes with header and loading handling */}
+                <Route path="/*" element={<AppContent />} />
+              </Routes>
             </div>
           </Router>
         </Theme>

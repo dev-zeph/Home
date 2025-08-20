@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
-import { 
-  Grid, 
+import {
+  Grid,
   Column,
   SideNav,
   SideNavItems,
@@ -21,7 +21,13 @@ import {
   Tag,
   IconButton,
   Loading,
-  Tile
+  Tile,
+  TextInput,
+  TextArea,
+  Select,
+  SelectItem,
+  Checkbox,
+  InlineNotification
 } from '@carbon/react';
 import { 
   Dashboard as DashboardIcon, 
@@ -408,9 +414,11 @@ const MyListings = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProperties, setTotalProperties] = useState(0);
+  const [notification, setNotification] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const location = useLocation();
+
   const propertiesPerPage = 6;
 
   useEffect(() => {
@@ -418,6 +426,20 @@ const MyListings = () => {
       fetchUserProperties();
     }
   }, [currentPage, user]);
+
+  // Show success message from navigation state
+  useEffect(() => {
+    if (location.state?.message) {
+      setNotification({
+        kind: 'success',
+        title: 'Success',
+        subtitle: location.state.message
+      });
+      
+      // Clear the message from location state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const fetchUserProperties = async () => {
     if (!user) return;
@@ -504,8 +526,8 @@ const MyListings = () => {
     { key: 'actions', header: 'Actions' }
   ];
 
-  const tableData = properties.map(property => ({
-    id: property.id,
+  const tableData = properties.map((property, index) => ({
+    rowId: `property-${property.id}`, // Use rowId instead of id to avoid key conflicts
     image: (
       <img 
         src={property.property_media?.[0]?.url || '/placeholder-property.jpg'} 
@@ -574,6 +596,16 @@ const MyListings = () => {
         </Button>
       </div>
 
+      {notification && (
+        <InlineNotification
+          kind={notification.kind}
+          title={notification.title}
+          subtitle={notification.subtitle}
+          style={{ marginBottom: '1rem' }}
+          onCloseButtonClick={() => setNotification(null)}
+        />
+      )}
+
       {properties.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#f4f4f4', borderRadius: '8px' }}>
           <Building size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
@@ -598,7 +630,7 @@ const MyListings = () => {
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
-                        <TableHeader {...getHeaderProps({ header })}>
+                        <TableHeader key={header.key} {...getHeaderProps({ header })}>
                           {header.header}
                         </TableHeader>
                       ))}
@@ -606,7 +638,7 @@ const MyListings = () => {
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
-                      <TableRow {...getRowProps({ row })}>
+                      <TableRow key={row.id} {...getRowProps({ row })}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value}
@@ -641,8 +673,28 @@ const PropertyEdit = () => {
   const { propertyId } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Form state
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    price: '',
+    deposit_ngn: '',
+    property_type: 'apartment',
+    bedrooms: '',
+    bathrooms: '',
+    furnished: false,
+    city: '',
+    state: '',
+    area: '',
+    address_text: '',
+    status: 'active'
+  });
+
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (user && propertyId) {
@@ -666,11 +718,117 @@ const PropertyEdit = () => {
       }
 
       setProperty(data);
+      // Initialize form with property data
+      setFormData({
+        title: data.title || '',
+        description: data.description || '',
+        price: data.price?.toString() || '',
+        deposit_ngn: data.deposit_ngn?.toString() || '',
+        property_type: data.property_type || 'apartment',
+        bedrooms: data.bedrooms?.toString() || '',
+        bathrooms: data.bathrooms?.toString() || '',
+        furnished: data.furnished || false,
+        city: data.city || '',
+        state: data.state || '',
+        area: data.area || '',
+        address_text: data.address_text || '',
+        status: data.status || 'active'
+      });
     } catch (error) {
       console.error('Error fetching property:', error);
       navigate('/dashboard/listings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = 'Property title is required';
+    }
+
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      newErrors.price = 'Valid price is required';
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
+    }
+
+    if (formData.bedrooms && (parseInt(formData.bedrooms) < 0 || parseInt(formData.bedrooms) > 20)) {
+      newErrors.bedrooms = 'Bedrooms must be between 0 and 20';
+    }
+
+    if (formData.bathrooms && (parseInt(formData.bathrooms) < 0 || parseInt(formData.bathrooms) > 20)) {
+      newErrors.bathrooms = 'Bathrooms must be between 0 and 20';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const updateData = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        price: parseInt(formData.price),
+        deposit_ngn: formData.deposit_ngn ? parseInt(formData.deposit_ngn) : null,
+        property_type: formData.property_type,
+        bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
+        bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
+        furnished: formData.furnished,
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        area: formData.area.trim(),
+        address_text: formData.address_text.trim(),
+        status: formData.status,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('properties')
+        .update(updateData)
+        .eq('id', propertyId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating property:', error);
+        setErrors({ submit: 'Failed to update property. Please try again.' });
+        return;
+      }
+
+      // Success - navigate back to listings
+      navigate('/dashboard/listings', { 
+        state: { message: 'Property updated successfully!' } 
+      });
+    } catch (error) {
+      console.error('Error updating property:', error);
+      setErrors({ submit: 'An unexpected error occurred. Please try again.' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -708,30 +866,240 @@ const PropertyEdit = () => {
         </Button>
       </div>
 
-      <div style={{ 
-        padding: '2rem', 
-        backgroundColor: '#f4f4f4', 
-        borderRadius: '8px',
-        textAlign: 'center'
-      }}>
-        <Edit size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-        <h3>Property Editing</h3>
-        <p>Property editing functionality will be implemented here.</p>
-        <p style={{ marginBottom: '1.5rem' }}>
-          <strong>Property:</strong> {property.title}
-        </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <Button kind="primary">
-            Edit Details
-          </Button>
-          <Button kind="secondary">
-            Manage Photos
-          </Button>
-          <Button kind="secondary">
-            View Inquiries
-          </Button>
-        </div>
-      </div>
+      <Grid fullWidth>
+        <Column lg={8} md={8} sm={4}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* Error display for form submission */}
+            {errors.submit && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ 
+                  padding: '1rem', 
+                  backgroundColor: '#fdf2f2', 
+                  border: '1px solid #f87171',
+                  borderRadius: '4px',
+                  color: '#b91c1c'
+                }}>
+                  <strong>Error:</strong> {errors.submit}
+                </div>
+              </div>
+            )}
+
+            {/* Basic Information */}
+            <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+              <h4 style={{ marginBottom: '1rem' }}>Basic Information</h4>
+              
+              <div style={{ marginBottom: '1rem' }}>
+                <TextInput
+                  id="title"
+                  labelText="Property Title *"
+                  placeholder="e.g., Beautiful 2BR Apartment in Victoria Island"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  invalid={!!errors.title}
+                  invalidText={errors.title}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <TextArea
+                  id="description"
+                  labelText="Description"
+                  placeholder="Describe your property, amenities, and neighborhood..."
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  rows={4}
+                />
+              </div>
+
+              <Grid style={{ marginBottom: '1rem' }}>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="price"
+                    labelText="Monthly Rent (NGN) *"
+                    placeholder="e.g., 500000"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    invalid={!!errors.price}
+                    invalidText={errors.price}
+                  />
+                </Column>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="deposit"
+                    labelText="Security Deposit (NGN)"
+                    placeholder="e.g., 1000000"
+                    value={formData.deposit_ngn}
+                    onChange={(e) => handleInputChange('deposit_ngn', e.target.value)}
+                  />
+                </Column>
+              </Grid>
+            </div>
+
+            {/* Property Details */}
+            <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+              <h4 style={{ marginBottom: '1rem' }}>Property Details</h4>
+              
+              <Grid style={{ marginBottom: '1rem' }}>
+                <Column lg={8} md={8} sm={4}>
+                  <Select
+                    id="property_type"
+                    labelText="Property Type"
+                    value={formData.property_type}
+                    onChange={(e) => handleInputChange('property_type', e.target.value)}
+                  >
+                    <SelectItem value="apartment" text="Apartment" />
+                    <SelectItem value="house" text="House" />
+                    <SelectItem value="shared" text="Shared Accommodation" />
+                    <SelectItem value="land" text="Land" />
+                  </Select>
+                </Column>
+                <Column lg={8} md={8} sm={4}>
+                  <Select
+                    id="status"
+                    labelText="Status"
+                    value={formData.status}
+                    onChange={(e) => handleInputChange('status', e.target.value)}
+                  >
+                    <SelectItem value="active" text="Active" />
+                    <SelectItem value="inactive" text="Inactive" />
+                    <SelectItem value="pending" text="Pending Review" />
+                  </Select>
+                </Column>
+              </Grid>
+
+              <Grid style={{ marginBottom: '1rem' }}>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="bedrooms"
+                    labelText="Bedrooms"
+                    placeholder="e.g., 2"
+                    value={formData.bedrooms}
+                    onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+                    invalid={!!errors.bedrooms}
+                    invalidText={errors.bedrooms}
+                  />
+                </Column>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="bathrooms"
+                    labelText="Bathrooms"
+                    placeholder="e.g., 2"
+                    value={formData.bathrooms}
+                    onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+                    invalid={!!errors.bathrooms}
+                    invalidText={errors.bathrooms}
+                  />
+                </Column>
+              </Grid>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <Checkbox
+                  id="furnished"
+                  labelText="Furnished"
+                  checked={formData.furnished}
+                  onChange={(checked) => handleInputChange('furnished', checked)}
+                />
+              </div>
+            </div>
+
+            {/* Location */}
+            <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+              <h4 style={{ marginBottom: '1rem' }}>Location</h4>
+              
+              <Grid style={{ marginBottom: '1rem' }}>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="city"
+                    labelText="City *"
+                    placeholder="e.g., Lagos"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    invalid={!!errors.city}
+                    invalidText={errors.city}
+                  />
+                </Column>
+                <Column lg={8} md={8} sm={4}>
+                  <TextInput
+                    id="state"
+                    labelText="State"
+                    placeholder="e.g., Lagos State"
+                    value={formData.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                  />
+                </Column>
+              </Grid>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <TextInput
+                  id="area"
+                  labelText="Area/Neighborhood"
+                  placeholder="e.g., Victoria Island, Ikoyi"
+                  value={formData.area}
+                  onChange={(e) => handleInputChange('area', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <TextArea
+                  id="address"
+                  labelText="Full Address"
+                  placeholder="Complete address for the property..."
+                  value={formData.address_text}
+                  onChange={(e) => handleInputChange('address_text', e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', padding: '1rem 0' }}>
+              <Button
+                kind="secondary"
+                onClick={() => navigate('/dashboard/listings')}
+                disabled={saving}
+              >
+                Cancel
+              </Button>
+              <Button
+                kind="primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </div>
+        </Column>
+
+        <Column lg={8} md={8} sm={4}>
+          <div style={{ padding: '1.5rem', backgroundColor: '#f4f4f4', borderRadius: '8px', height: 'fit-content' }}>
+            <h4 style={{ marginBottom: '1rem' }}>Property Preview</h4>
+            <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
+              <h5 style={{ margin: '0 0 0.5rem 0' }}>{formData.title || 'Property Title'}</h5>
+              <p style={{ margin: '0 0 0.5rem 0', color: '#666', fontSize: '0.875rem' }}>
+                {formData.area && formData.city ? `${formData.area}, ${formData.city}` : formData.city || 'Location'}
+              </p>
+              <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#0f62fe' }}>
+                ₦{formData.price ? parseInt(formData.price).toLocaleString() : '0'}/month
+              </p>
+              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#666' }}>
+                {formData.bedrooms && <span>{formData.bedrooms} bed</span>}
+                {formData.bathrooms && <span>{formData.bathrooms} bath</span>}
+                <span style={{ textTransform: 'capitalize' }}>{formData.property_type}</span>
+                {formData.furnished && <span>Furnished</span>}
+              </div>
+            </div>
+            
+            <div style={{ fontSize: '0.875rem', color: '#666' }}>
+              <p><strong>Status:</strong> <span style={{ textTransform: 'capitalize' }}>{formData.status}</span></p>
+              {formData.deposit_ngn && (
+                <p><strong>Deposit:</strong> ₦{parseInt(formData.deposit_ngn).toLocaleString()}</p>
+              )}
+            </div>
+          </div>
+        </Column>
+      </Grid>
     </div>
   );
 };

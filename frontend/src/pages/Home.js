@@ -42,14 +42,18 @@ const Home = () => {
   // Fetch properties on component mount
   useEffect(() => {
     fetchProperties();
-  }, []);
+    
+    // Add a safety timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Loading timeout - stopping fetch');
+        setLoading(false);
+        setError('Loading took too long. Please refresh the page.');
+      }
+    }, 10000); // 10 second timeout
 
-  // Re-fetch when filters change
-  useEffect(() => {
-    if (!loading) {
-      handleSearch();
-    }
-  }, [filters]);
+    return () => clearTimeout(loadingTimeout);
+  }, []);
 
   // Handle scroll to search section when navigating from other pages
   useEffect(() => {
@@ -70,11 +74,14 @@ const Home = () => {
     try {
       setLoading(true);
       setError('');
+      console.log('Fetching properties with filters:', filters);
       const data = await propertyService.getProperties(filters);
+      console.log('Properties fetched:', data?.length || 0);
       setProperties(data || []);
     } catch (err) {
-      setError('Failed to fetch properties: ' + err.message);
       console.error('Error fetching properties:', err);
+      setError('Failed to load properties. Please try again later.');
+      setProperties([]); // Ensure properties is always an array
     } finally {
       setLoading(false);
     }
@@ -89,11 +96,14 @@ const Home = () => {
     try {
       setLoading(true);
       setError('');
+      console.log('Searching with filters:', searchFilters);
       const data = await propertyService.getProperties(searchFilters);
+      console.log('Search results:', data?.length || 0);
       setProperties(data || []);
     } catch (err) {
-      setError('Search failed: ' + err.message);
       console.error('Error searching properties:', err);
+      setError('Search failed. Please try again.');
+      setProperties([]); // Ensure properties is always an array
     } finally {
       setLoading(false);
     }

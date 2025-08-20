@@ -1,6 +1,20 @@
-# Getting Started with Create React App
+# NG Rentals - Nigeria-focused Rentals Marketplace
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and uses Carbon Design System for UI components.
+
+## 🚀 Quick Start
+
+### Regular Users
+1. `npm start` - Start the development server
+2. Navigate to `http://localhost:3000`
+3. Sign up or login to browse properties
+
+### Admin Users  
+1. `npm start` - Start the development server
+2. Navigate to `http://localhost:3000/admin/signup` or `/admin/login`
+3. Access property verification dashboard
+
+See `ADMIN_SETUP.md` for detailed admin setup instructions.
 
 ## Available Scripts
 
