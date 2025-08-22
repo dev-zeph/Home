@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps API Test</title>
+</head>
+<body>
+    <h1>Google Maps API Key Test</h1>
+    <div id="map" style="height: 400px; width: 100%;"></div>
+    <div id="status"></div>
+    
+    <script>
+        // Test the API key
+        const API_KEY = 'AIzaSyBDercOeszfqPubm_pZV6YhroImsJuE0Lw';
+        
+        function initMap() {
+            document.getElementById('status').innerHTML = '✅ Google Maps API loaded successfully!';
+            
+            // Create a simple map
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 10,
+                center: { lat: 6.5244, lng: 3.3792 } // Lagos, Nigeria
+            });
+            
+            // Test Places Autocomplete
+            const input = document.createElement('input');
+            input.placeholder = 'Search places in Nigeria...';
+            input.style.cssText = 'margin: 10px; padding: 10px; width: 300px;';
+            document.body.insertBefore(input, document.getElementById('map'));
+            
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                componentRestrictions: { country: 'ng' },
+                types: ['address']
+            });
+            
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(15);
+                    document.getElementById('status').innerHTML = '✅ Places API working! Selected: ' + place.formatted_address;
+                }
+            });
+        }
+        
+        function handleError() {
+            document.getElementById('status').innerHTML = '❌ Google Maps API failed to load. Check your API key and restrictions.';
+        }
+    </script>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDercOeszfqPubm_pZV6YhroImsJuE0Lw&libraries=places&callback=initMap&onerror=handleError" async defer></script>
+</body>
+</html>

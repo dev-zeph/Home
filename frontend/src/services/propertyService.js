@@ -22,6 +22,9 @@ export const propertyService = {
     if (filters.property_type) {
       query = query.eq('property_type', filters.property_type);
     }
+    if (filters.listing_type) {
+      query = query.eq('listing_type', filters.listing_type);
+    }
     if (filters.min_price) {
       query = query.gte('price', filters.min_price);
     }
