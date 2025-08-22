@@ -32,6 +32,7 @@ const Home = () => {
     minPrice: '',
     maxPrice: '',
     propertyType: '',
+    listingType: '',
     beds: '',
     baths: ''
   });
@@ -75,7 +76,17 @@ const Home = () => {
       setLoading(true);
       setError('');
       console.log('Fetching properties with filters:', filters);
-      const data = await propertyService.getProperties(filters);
+      
+      // Map frontend filter names to backend expected names
+      const apiFilters = {
+        city: filters.city,
+        property_type: filters.propertyType,
+        listing_type: filters.listingType,
+        min_price: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+        max_price: filters.maxPrice ? parseInt(filters.maxPrice) : undefined
+      };
+      
+      const data = await propertyService.getProperties(apiFilters);
       console.log('Properties fetched:', data?.length || 0);
       setProperties(data || []);
     } catch (err) {
@@ -89,8 +100,11 @@ const Home = () => {
 
   const handleSearch = async () => {
     const searchFilters = {
-      ...filters,
-      ...(searchQuery && { city: searchQuery })
+      city: searchQuery || filters.city,
+      property_type: filters.propertyType,
+      listing_type: filters.listingType,
+      min_price: filters.minPrice ? parseInt(filters.minPrice) : undefined,
+      max_price: filters.maxPrice ? parseInt(filters.maxPrice) : undefined
     };
     
     try {
@@ -297,6 +311,20 @@ const Home = () => {
                   <SelectItem value="house" text="House" />
                   <SelectItem value="shared" text="Shared Space" />
                   <SelectItem value="land" text="Land" />
+                  <SelectItem value="office" text="Office Space" />
+                  <SelectItem value="warehouse" text="Warehouse" />
+                  <SelectItem value="shop" text="Shop/Commercial" />
+                </Select>
+
+                <Select
+                  id="listing-type-select"
+                  labelText="Listing Type"
+                  value={filters.listingType || ''}
+                  onChange={(e) => setFilters({...filters, listingType: e.target.value})}
+                >
+                  <SelectItem value="" text="All Listings" />
+                  <SelectItem value="rent" text="For Rent" />
+                  <SelectItem value="sale" text="For Sale" />
                 </Select>
 
                 <NumberInput
@@ -366,7 +394,7 @@ const Home = () => {
                             <h4>{property.title}</h4>
                             <p className="listing-price">
                               <Currency size={16} />
-                              {formatPrice(property.price)}/year
+                              {formatPrice(property.price)}{property.listing_type === 'rent' ? '/month' : ''}
                             </p>
                             <p className="listing-location">
                               <Location size={16} />
@@ -376,6 +404,9 @@ const Home = () => {
                               <span>{property.bedrooms} beds</span>
                               <span>{property.bathrooms} baths</span>
                               <span>{property.property_type}</span>
+                              <Tag type={property.listing_type === 'rent' ? 'blue' : 'purple'} size="sm">
+                                {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                              </Tag>
                             </div>
                           </div>
                         </Tile>

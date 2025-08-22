@@ -20,6 +20,8 @@ import {
 } from '@carbon/react';
 import { useAuth } from '../contexts/AuthContext';
 import { propertyService } from '../services/propertyService';
+import GoogleMapsLoader from '../components/GoogleMapsLoader';
+import GooglePlacesAutocomplete from '../components/GooglePlacesAutocomplete';
 
 const PostProperty = () => {
   const { user, isAuthenticated } = useAuth();
@@ -32,6 +34,7 @@ const PostProperty = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    listing_type: 'rent', // 'rent' or 'sale'
     price: '',
     deposit_ngn: '',
     property_type: 'apartment',
@@ -42,6 +45,7 @@ const PostProperty = () => {
     state: '',
     area: '',
     address_text: '',
+    address_components: null, // Will store Google Places data
     amenities: []
   });
 
@@ -79,6 +83,19 @@ const PostProperty = () => {
     'Niger State', 'Benue State', 'Kogi State', 'Nasarawa State', 'Abia State',
     'Ebonyi State', 'Bayelsa State', 'Ekiti State'
   ];
+
+  const handlePlaceSelect = (addressData) => {
+    console.log('Selected place:', addressData);
+    
+    setFormData(prev => ({
+      ...prev,
+      address_text: addressData.formatted_address,
+      city: addressData.city || addressData.locality,
+      state: addressData.state,
+      area: addressData.locality || addressData.route,
+      address_components: addressData
+    }));
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -145,14 +162,24 @@ const PostProperty = () => {
     try {
       // Prepare property data
       const propertyData = {
-        ...formData,
-        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        listing_type: formData.listing_type,
         price: parseInt(formData.price),
         deposit_ngn: formData.deposit_ngn ? parseInt(formData.deposit_ngn) : null,
+        property_type: formData.property_type,
         bedrooms: parseInt(formData.bedrooms),
         bathrooms: parseInt(formData.bathrooms),
+        furnished: formData.furnished,
+        city: formData.city,
+        state: formData.state,
+        area: formData.area,
+        address_text: formData.address_text,
+        amenities: formData.amenities,
+        user_id: user.id,
         status: 'pending', // Will be reviewed by admin
-        verified: false
+        verified: false,
+        address_components: formData.address_components
       };
 
       // Create property
@@ -169,13 +196,18 @@ const PostProperty = () => {
         }
       }
 
-      setSuccess('Property submitted successfully! 🎉 Your listing has been sent for review by our verification officers. You will receive an email notification once it has been approved and goes live on the platform.');
+      const successMessage = formData.listing_type === 'rent' 
+        ? 'Rental property submitted successfully! 🎉 Your rental listing has been sent for review by our verification officers. You will receive an email notification once it has been approved and goes live on the platform.'
+        : 'Property for sale submitted successfully! 🎉 Your property listing has been sent for review by our verification officers. You will receive an email notification once it has been approved and goes live on the platform.';
+      
+      setSuccess(successMessage);
       setShowToast(true);
       
       // Reset form
       setFormData({
         title: '',
         description: '',
+        listing_type: 'rent',
         price: '',
         deposit_ngn: '',
         property_type: 'apartment',
@@ -186,6 +218,7 @@ const PostProperty = () => {
         state: '',
         area: '',
         address_text: '',
+        address_components: null,
         amenities: []
       });
       setSelectedFiles([]);
@@ -217,33 +250,39 @@ const PostProperty = () => {
   }
 
   return (
-    <div style={{ padding: '2rem 0', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
-      {/* Toast Notification */}
-      {showToast && (
-        <div style={{ 
-          position: 'fixed', 
-          top: '100px', 
-          right: '20px', 
-          zIndex: 9999,
-          maxWidth: '400px'
-        }}>
-          <ToastNotification
-            kind="success"
-            title="Property Submitted! 🎉"
-            subtitle="Your listing is now being reviewed by our verification team. You'll be notified once it's approved!"
-            timeout={4000}
-            onCloseButtonClick={() => setShowToast(false)}
-          />
-        </div>
-      )}
+    <GoogleMapsLoader apiKey="AIzaSyBDercOeszfqPubm_pZV6YhroImsJuE0Lw">
+      <div style={{ padding: '2rem 0', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
+        {/* Toast Notification */}
+        {showToast && (
+          <div style={{ 
+            position: 'fixed', 
+            top: '100px', 
+            right: '20px', 
+            zIndex: 9999,
+            maxWidth: '400px'
+          }}>
+            <ToastNotification
+              kind="success"
+              title={formData.listing_type === 'rent' ? "Rental Property Submitted! 🎉" : "Property for Sale Submitted! 🎉"}
+              subtitle="Your listing is now being reviewed by our verification team. You'll be notified once it's approved!"
+              timeout={4000}
+              onCloseButtonClick={() => setShowToast(false)}
+            />
+          </div>
+        )}
 
       <Grid>
         <Column sm={4} md={8} lg={12} xlg={12} max={16}>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <Tile style={{ padding: '2rem', marginBottom: '2rem' }}>
               <Heading style={{ marginBottom: '1.5rem' }}>
-                Post Your Property
+                List Your Property
               </Heading>
+              
+              <p style={{ marginBottom: '2rem', color: '#525252' }}>
+                Whether you're renting out or selling your property, we'll help you reach the right audience. 
+                Fill out the details below and our verification team will review your listing.
+              </p>
 
               {error && (
                 <InlineNotification
@@ -301,6 +340,27 @@ const PostProperty = () => {
                     />
                   </Column>
 
+                  {/* Listing Type */}
+                  <Column sm={4} md={8} lg={16}>
+                    <Heading size="4" style={{ margin: '1.5rem 0 1rem 0' }}>
+                      Listing Details
+                    </Heading>
+                  </Column>
+
+                  <Column sm={4} md={4} lg={8}>
+                    <Select
+                      id="listing_type"
+                      name="listing_type"
+                      labelText="Listing Type"
+                      value={formData.listing_type}
+                      onChange={handleInputChange}
+                      style={{ marginBottom: '1rem' }}
+                    >
+                      <SelectItem value="rent" text="For Rent" />
+                      <SelectItem value="sale" text="For Sale" />
+                    </Select>
+                  </Column>
+
                   <Column sm={4} md={4} lg={8}>
                     <Select
                       id="property_type"
@@ -314,6 +374,9 @@ const PostProperty = () => {
                       <SelectItem value="house" text="House" />
                       <SelectItem value="shared" text="Shared Accommodation" />
                       <SelectItem value="land" text="Land" />
+                      <SelectItem value="office" text="Office Space" />
+                      <SelectItem value="warehouse" text="Warehouse" />
+                      <SelectItem value="shop" text="Shop/Commercial" />
                     </Select>
                   </Column>
 
@@ -338,7 +401,7 @@ const PostProperty = () => {
                     <NumberInput
                       id="price"
                       name="price"
-                      label="Monthly Rent (₦)"
+                      label={formData.listing_type === 'rent' ? "Monthly Rent (₦)" : "Sale Price (₦)"}
                       value={formData.price}
                       onChange={(e) => handleNumberChange(e, 'price')}
                       min={0}
@@ -347,18 +410,29 @@ const PostProperty = () => {
                     />
                   </Column>
 
-                  <Column sm={4} md={4} lg={8}>
-                    <NumberInput
-                      id="deposit_ngn"
-                      name="deposit_ngn"
-                      label="Security Deposit (₦)"
-                      value={formData.deposit_ngn}
-                      onChange={(e) => handleNumberChange(e, 'deposit_ngn')}
-                      min={0}
-                      helperText="Optional"
-                      style={{ marginBottom: '1rem' }}
-                    />
-                  </Column>
+                  {formData.listing_type === 'rent' && (
+                    <Column sm={4} md={4} lg={8}>
+                      <NumberInput
+                        id="deposit_ngn"
+                        name="deposit_ngn"
+                        label="Security Deposit (₦)"
+                        value={formData.deposit_ngn}
+                        onChange={(e) => handleNumberChange(e, 'deposit_ngn')}
+                        min={0}
+                        style={{ marginBottom: '1rem' }}
+                      />
+                    </Column>
+                  )}
+
+                  {formData.listing_type === 'sale' && (
+                    <Column sm={4} md={4} lg={8}>
+                      <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+                        <p style={{ margin: 0, fontSize: '14px', color: '#525252' }}>
+                          💡 <strong>Tip:</strong> Consider market rates in your area. Our platform will help you reach serious buyers.
+                        </p>
+                      </div>
+                    </Column>
+                  )}
 
                   {/* Property Details */}
                   <Column sm={4} md={8} lg={16}>
@@ -412,6 +486,18 @@ const PostProperty = () => {
                     </Heading>
                   </Column>
 
+                  <Column sm={4} md={8} lg={16}>
+                    <GooglePlacesAutocomplete
+                      id="address_text"
+                      labelText="Property Address"
+                      placeholder="Start typing your property address..."
+                      value={formData.address_text}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address_text: e.target.value }))}
+                      onPlaceSelect={handlePlaceSelect}
+                      style={{ marginBottom: '1rem' }}
+                    />
+                  </Column>
+
                   <Column sm={4} md={4} lg={8}>
                     <TextInput
                       id="city"
@@ -419,9 +505,10 @@ const PostProperty = () => {
                       labelText="City"
                       value={formData.city}
                       onChange={handleInputChange}
-                      placeholder="e.g., Lagos, Abuja"
+                      placeholder="Auto-filled from address"
                       required
                       style={{ marginBottom: '1rem' }}
+                      helperText="This will be auto-filled when you select an address above"
                     />
                   </Column>
 
@@ -449,21 +536,9 @@ const PostProperty = () => {
                       labelText="Area/Neighborhood"
                       value={formData.area}
                       onChange={handleInputChange}
-                      placeholder="e.g., Victoria Island, Maitama"
+                      placeholder="Auto-filled from address"
                       style={{ marginBottom: '1rem' }}
-                    />
-                  </Column>
-
-                  <Column sm={4} md={8} lg={16}>
-                    <TextArea
-                      id="address_text"
-                      name="address_text"
-                      labelText="Full Address"
-                      value={formData.address_text}
-                      onChange={handleInputChange}
-                      placeholder="Complete address with landmarks"
-                      rows={2}
-                      style={{ marginBottom: '1rem' }}
+                      helperText="This will be auto-filled when you select an address above"
                     />
                   </Column>
 
@@ -506,6 +581,7 @@ const PostProperty = () => {
         </Column>
       </Grid>
     </div>
+    </GoogleMapsLoader>
   );
 };
 
