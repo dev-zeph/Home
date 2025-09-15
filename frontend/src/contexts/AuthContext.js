@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email, password, userData = {}) => {
+  const signUp = async (email, password, userData = {}, options = {}) => {
     try {
       setLoading(true)
       
@@ -57,7 +57,8 @@ export const AuthProvider = ({ children }) => {
             display_name: userData.displayName || '',
             username: userData.username || '',
             phone: userData.phone || ''
-          }
+          },
+          emailRedirectTo: options.emailRedirectTo
         }
       })
       

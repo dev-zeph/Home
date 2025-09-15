@@ -53,73 +53,124 @@ const Login = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', paddingTop: '4rem', backgroundColor: '#f4f4f4' }}>
-      <Grid>
-        <Column sm={4} md={6} lg={8} xlg={10} max={12}>
-          <div style={{ maxWidth: '400px', margin: '0 auto', paddingTop: '2rem' }}>
-            <Tile style={{ padding: '2rem' }}>
-              <Heading style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                Sign In to NG Rentals
-              </Heading>
-              
-              {error && (
-                <InlineNotification
-                  kind="error"
-                  title="Error"
-                  subtitle={error}
-                  style={{ marginBottom: '1rem' }}
-                  hideCloseButton
-                />
-              )}
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f4f4f4',
+      padding: '1rem'
+    }}>
+      <Grid 
+  fullWidth 
+  style={{ 
+    maxWidth: '1200px', 
+    display: 'flex', 
+    justifyContent: 'center' 
+  }}
+>
+  <Column sm={4} md={6} lg={6} xlg={6}>
+    <div style={{ 
+      maxWidth: '450px', 
+      margin: '0 auto',
+      width: '100%'
+    }}>
+      <Tile style={{ 
+        padding: '2.5rem',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e0e0e0'
+      }}>
+        <Heading style={{ 
+          marginBottom: '2rem', 
+          textAlign: 'center',
+          color: '#161616'
+        }}>
+          Sign In to NG Rentals
+        </Heading>
+        
+        {error && (
+          <InlineNotification
+            kind="error"
+            title="Error"
+            subtitle={error}
+            style={{ marginBottom: '1rem' }}
+            hideCloseButton
+          />
+        )}
 
-              <Form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '1rem' }}>
-                  <TextInput
-                    id="email"
-                    name="email"
-                    labelText="Email Address"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    invalid={error && error.includes('email')}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '2rem' }}>
-                  <PasswordInput
-                    id="password"
-                    name="password"
-                    labelText="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    invalid={error && error.includes('password')}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  size="lg"
-                  style={{ width: '100%', marginBottom: '1rem' }}
-                  disabled={loading}
-                >
-                  {loading ? 'Signing In...' : 'Sign In'}
-                </Button>
-
-                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                  <p>
-                    Don't have an account?{' '}
-                    <Link to="/signup" style={{ color: '#0f62fe', textDecoration: 'none' }}>
-                      Sign up here
-                    </Link>
-                  </p>
-                </div>
-              </Form>
-            </Tile>
+        <Form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <TextInput
+              id="email"
+              name="email"
+              labelText="Email Address"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              invalid={error && error.includes('email')}
+              size="lg"
+              placeholder="Enter your email address"
+            />
           </div>
-        </Column>
-      </Grid>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <PasswordInput
+              id="password"
+              name="password"
+              labelText="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              invalid={error && error.includes('password')}
+              size="lg"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            size="lg"
+            style={{ 
+              width: '100%', 
+              marginBottom: '2rem',
+              height: '48px'
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </Button>
+
+          <div style={{ 
+            textAlign: 'center',
+            paddingTop: '1rem',
+            borderTop: '1px solid #e0e0e0'
+          }}>
+            <p style={{ 
+              margin: '0 0 1rem 0',
+              color: '#525252',
+              fontSize: '0.95rem'
+            }}>
+              Don't have an account?
+            </p>
+            <Link 
+              to="/signup" 
+              style={{ 
+                color: '#0f62fe', 
+                textDecoration: 'none',
+                fontSize: '1rem',
+                fontWeight: '500'
+              }}
+            >
+              Create Account →
+            </Link>
+          </div>
+        </Form>
+      </Tile>
+    </div>
+  </Column>
+</Grid>
+
     </div>
   );
 };
