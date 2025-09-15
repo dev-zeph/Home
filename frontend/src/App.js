@@ -122,7 +122,7 @@ const AppHeader = () => {
     <>
       <Header aria-label="NG Rentals">
         <HeaderName as={Link} to="/" prefix="">
-          NG Rentals
+          Home
         </HeaderName>
         <HeaderNavigation aria-label="Main Navigation">
           <HeaderMenuItem as={Link} to="/">
