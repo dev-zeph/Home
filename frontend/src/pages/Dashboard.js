@@ -270,9 +270,9 @@ const UserSearchModal = ({ isOpen, onClose, onStartConversation }) => {
 // Dashboard Home Component
 const DashboardHome = () => {
   const [stats, setStats] = useState({
-    totalProperties: 0,
+    totalCars: 0,
     totalViews: 0,
-    totalApplications: 0,
+    totalBookings: 0,
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
@@ -289,13 +289,13 @@ const DashboardHome = () => {
     if (!user) return;
 
     try {
-      // Fetch user's properties count
-      const { count: propertiesCount } = await supabase
+      // Fetch user's vehicles count
+      const { count: vehiclesCount } = await supabase
         .from('properties')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id);
 
-      // Fetch total views for user's properties
+      // Fetch total views for user's vehicles
       const { data: viewsData } = await supabase
         .from('property_views')
         .select('property_id')
@@ -309,7 +309,7 @@ const DashboardHome = () => {
 
       setStats(prev => ({
         ...prev,
-        totalProperties: propertiesCount || 0,
+        totalCars: vehiclesCount || 0,
         totalViews: viewsData?.length || 0
       }));
     } catch (error) {
@@ -330,7 +330,7 @@ const DashboardHome = () => {
   return (
     <div>
       <h2>Dashboard Overview</h2>
-      <p>Welcome back! Here's a summary of your activity on NG Rentals.</p>
+      <p>Welcome back! Here's a summary of your activity on RYD.</p>
       
       <div style={{ 
         display: 'grid', 
@@ -346,9 +346,9 @@ const DashboardHome = () => {
         }}>
           <Building size={32} style={{ marginBottom: '0.5rem', color: '#0f62fe' }} />
           <h3 style={{ margin: 0, fontSize: '2rem', color: '#0f62fe' }}>
-            {stats.totalProperties}
+            {stats.totalCars}
           </h3>
-          <p style={{ margin: 0, color: '#161616' }}>Total Properties</p>
+          <p style={{ margin: 0, color: '#161616' }}>Total Cars</p>
         </div>
         
         <div style={{ 
@@ -372,9 +372,9 @@ const DashboardHome = () => {
         }}>
           <Document size={32} style={{ marginBottom: '0.5rem', color: '#0f62fe' }} />
           <h3 style={{ margin: 0, fontSize: '2rem', color: '#0f62fe' }}>
-            {stats.totalApplications}
+            {stats.totalBookings}
           </h3>
-          <p style={{ margin: 0, color: '#161616' }}>Applications</p>
+          <p style={{ margin: 0, color: '#161616' }}>Bookings</p>
         </div>
       </div>
 
@@ -386,7 +386,7 @@ const DashboardHome = () => {
             renderIcon={Building}
             onClick={() => navigate('/post-property')}
           >
-            Add New Property
+            List New Vehicle
           </Button>
           {/* Messages button temporarily disabled
           <Button 
@@ -402,7 +402,7 @@ const DashboardHome = () => {
             renderIcon={Document}
             onClick={() => navigate('/dashboard/applications')}
           >
-            View Applications
+            View Bookings
           </Button>
         </div>
       </div>
@@ -511,26 +511,26 @@ const MyListings = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <Loading description="Loading your properties..." />
+        <Loading description="Loading your vehicles..." />
       </div>
     );
   }
 
   const headers = [
     { key: 'image', header: 'Image' },
-    { key: 'title', header: 'Property Title' },
+    { key: 'title', header: 'Vehicle Title' },
     { key: 'type', header: 'Type' },
-    { key: 'price', header: 'Price' },
+    { key: 'price', header: 'Daily Rate' },
     { key: 'views', header: 'Views' },
     { key: 'status', header: 'Status' },
     { key: 'actions', header: 'Actions' }
   ];
 
   const tableData = properties.map((property, index) => ({
-    rowId: `property-${property.id}`, // Use rowId instead of id to avoid key conflicts
+    rowId: `vehicle-${property.id}`, // Use rowId instead of id to avoid key conflicts
     image: (
       <img 
-        src={property.property_media?.[0]?.url || '/placeholder-property.jpg'} 
+        src={property.property_media?.[0]?.url || '/placeholder-vehicle.jpg'} 
         alt={property.title}
         style={{ 
           width: '60px', 
@@ -564,7 +564,7 @@ const MyListings = () => {
         <IconButton
           kind="ghost"
           size="sm"
-          label="Edit Property"
+          label="Edit Vehicle"
           onClick={() => handleEditProperty(property.id)}
         >
           <Edit size={16} />
@@ -572,7 +572,7 @@ const MyListings = () => {
         <IconButton
           kind="ghost"
           size="sm"
-          label="Manage Viewings"
+          label="Manage Bookings"
           onClick={() => handleViewingsManagement(property.id)}
         >
           <Calendar size={16} />
@@ -585,14 +585,14 @@ const MyListings = () => {
     <div>
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2>My Listings</h2>
-          <p>Manage your property listings and track their performance.</p>
+          <h2>My Cars</h2>
+          <p>Manage your vehicle listings and track their performance.</p>
         </div>
         <Button 
           kind="primary"
           onClick={() => navigate('/post-property')}
         >
-          Add New Property
+          List New Vehicle
         </Button>
       </div>
 
@@ -609,14 +609,14 @@ const MyListings = () => {
       {properties.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#f4f4f4', borderRadius: '8px' }}>
           <Building size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-          <h3>No Properties Listed</h3>
-          <p>You haven't listed any properties yet. Start by adding your first property!</p>
+          <h3>No Vehicles Listed</h3>
+          <p>You haven't listed any vehicles yet. Start by adding your first car!</p>
           <Button 
             kind="primary"
             style={{ marginTop: '1rem' }}
             onClick={() => navigate('/post-property')}
           >
-            List Your First Property
+            List Your First Vehicle
           </Button>
         </div>
       ) : (
@@ -669,9 +669,9 @@ const MyListings = () => {
   );
 };
 
-const PropertyEdit = () => {
+const VehicleEdit = () => {
   const { propertyId } = useParams();
-  const [property, setProperty] = useState(null);
+  const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
@@ -683,7 +683,7 @@ const PropertyEdit = () => {
     description: '',
     price: '',
     deposit_ngn: '',
-    property_type: 'apartment',
+    property_type: 'sedan',
     bedrooms: '',
     bathrooms: '',
     furnished: false,
@@ -698,11 +698,11 @@ const PropertyEdit = () => {
 
   useEffect(() => {
     if (user && propertyId) {
-      fetchProperty();
+      fetchVehicle();
     }
   }, [user, propertyId]);
 
-  const fetchProperty = async () => {
+  const fetchVehicle = async () => {
     try {
       const { data, error } = await supabase
         .from('properties')
@@ -712,19 +712,19 @@ const PropertyEdit = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching property:', error);
+        console.error('Error fetching vehicle:', error);
         navigate('/dashboard/listings');
         return;
       }
 
-      setProperty(data);
-      // Initialize form with property data
+      setVehicle(data);
+      // Initialize form with vehicle data
       setFormData({
         title: data.title || '',
         description: data.description || '',
         price: data.price?.toString() || '',
         deposit_ngn: data.deposit_ngn?.toString() || '',
-        property_type: data.property_type || 'apartment',
+        property_type: data.property_type || 'sedan',
         bedrooms: data.bedrooms?.toString() || '',
         bathrooms: data.bathrooms?.toString() || '',
         furnished: data.furnished || false,
@@ -735,7 +735,7 @@ const PropertyEdit = () => {
         status: data.status || 'active'
       });
     } catch (error) {
-      console.error('Error fetching property:', error);
+      console.error('Error fetching vehicle:', error);
       navigate('/dashboard/listings');
     } finally {
       setLoading(false);
@@ -761,7 +761,7 @@ const PropertyEdit = () => {
     const newErrors = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Property title is required';
+      newErrors.title = 'Vehicle title is required';
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
@@ -773,11 +773,11 @@ const PropertyEdit = () => {
     }
 
     if (formData.bedrooms && (parseInt(formData.bedrooms) < 0 || parseInt(formData.bedrooms) > 20)) {
-      newErrors.bedrooms = 'Bedrooms must be between 0 and 20';
+      newErrors.bedrooms = 'Seats must be between 0 and 20';
     }
 
     if (formData.bathrooms && (parseInt(formData.bathrooms) < 0 || parseInt(formData.bathrooms) > 20)) {
-      newErrors.bathrooms = 'Bathrooms must be between 0 and 20';
+      newErrors.bathrooms = 'Doors must be between 0 and 20';
     }
 
     setErrors(newErrors);
@@ -855,14 +855,14 @@ const PropertyEdit = () => {
     <div>
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2>Edit Property</h2>
-          <p>Update your property details and settings.</p>
+          <h2>Edit Vehicle</h2>
+          <p>Update your vehicle details and settings.</p>
         </div>
         <Button 
           kind="secondary"
           onClick={() => navigate('/dashboard/listings')}
         >
-          Back to Listings
+          Back to My Cars
         </Button>
       </div>
 
@@ -892,8 +892,8 @@ const PropertyEdit = () => {
               <div style={{ marginBottom: '1rem' }}>
                 <TextInput
                   id="title"
-                  labelText="Property Title *"
-                  placeholder="e.g., Beautiful 2BR Apartment in Victoria Island"
+                  labelText="Vehicle Title *"
+                  placeholder="e.g., Toyota Camry 2020 - Clean & Reliable"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   invalid={!!errors.title}
@@ -905,7 +905,7 @@ const PropertyEdit = () => {
                 <TextArea
                   id="description"
                   labelText="Description"
-                  placeholder="Describe your property, amenities, and neighborhood..."
+                  placeholder="Describe your vehicle, features, and condition..."
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   rows={4}
@@ -916,8 +916,8 @@ const PropertyEdit = () => {
                 <Column lg={8} md={8} sm={4}>
                   <TextInput
                     id="price"
-                    labelText="Monthly Rent (NGN) *"
-                    placeholder="e.g., 500000"
+                    labelText="Daily Rate (NGN) *"
+                    placeholder="e.g., 15000"
                     value={formData.price}
                     onChange={(e) => handleInputChange('price', e.target.value)}
                     invalid={!!errors.price}
@@ -928,7 +928,7 @@ const PropertyEdit = () => {
                   <TextInput
                     id="deposit"
                     labelText="Security Deposit (NGN)"
-                    placeholder="e.g., 1000000"
+                    placeholder="e.g., 50000"
                     value={formData.deposit_ngn}
                     onChange={(e) => handleInputChange('deposit_ngn', e.target.value)}
                   />
@@ -936,22 +936,24 @@ const PropertyEdit = () => {
               </Grid>
             </div>
 
-            {/* Property Details */}
+            {/* Vehicle Details */}
             <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
-              <h4 style={{ marginBottom: '1rem' }}>Property Details</h4>
+              <h4 style={{ marginBottom: '1rem' }}>Vehicle Details</h4>
               
               <Grid style={{ marginBottom: '1rem' }}>
                 <Column lg={8} md={8} sm={4}>
                   <Select
                     id="property_type"
-                    labelText="Property Type"
+                    labelText="Vehicle Type"
                     value={formData.property_type}
                     onChange={(e) => handleInputChange('property_type', e.target.value)}
                   >
-                    <SelectItem value="apartment" text="Apartment" />
-                    <SelectItem value="house" text="House" />
-                    <SelectItem value="shared" text="Shared Accommodation" />
-                    <SelectItem value="land" text="Land" />
+                    <SelectItem value="sedan" text="Sedan" />
+                    <SelectItem value="suv" text="SUV" />
+                    <SelectItem value="hatchback" text="Hatchback" />
+                    <SelectItem value="van" text="Van" />
+                    <SelectItem value="truck" text="Truck" />
+                    <SelectItem value="luxury" text="Luxury" />
                   </Select>
                 </Column>
                 <Column lg={8} md={8} sm={4}>
@@ -972,8 +974,8 @@ const PropertyEdit = () => {
                 <Column lg={8} md={8} sm={4}>
                   <TextInput
                     id="bedrooms"
-                    labelText="Bedrooms"
-                    placeholder="e.g., 2"
+                    labelText="Seats"
+                    placeholder="e.g., 5"
                     value={formData.bedrooms}
                     onChange={(e) => handleInputChange('bedrooms', e.target.value)}
                     invalid={!!errors.bedrooms}
@@ -983,8 +985,8 @@ const PropertyEdit = () => {
                 <Column lg={8} md={8} sm={4}>
                   <TextInput
                     id="bathrooms"
-                    labelText="Bathrooms"
-                    placeholder="e.g., 2"
+                    labelText="Doors"
+                    placeholder="e.g., 4"
                     value={formData.bathrooms}
                     onChange={(e) => handleInputChange('bathrooms', e.target.value)}
                     invalid={!!errors.bathrooms}
@@ -996,7 +998,7 @@ const PropertyEdit = () => {
               <div style={{ marginBottom: '1rem' }}>
                 <Checkbox
                   id="furnished"
-                  labelText="Furnished"
+                  labelText="Air Conditioning"
                   checked={formData.furnished}
                   onChange={(checked) => handleInputChange('furnished', checked)}
                 />
@@ -1043,8 +1045,8 @@ const PropertyEdit = () => {
               <div>
                 <TextArea
                   id="address"
-                  labelText="Full Address"
-                  placeholder="Complete address for the property..."
+                  labelText="Pickup Location"
+                  placeholder="Where can renters pick up the vehicle..."
                   value={formData.address_text}
                   onChange={(e) => handleInputChange('address_text', e.target.value)}
                   rows={3}
@@ -1074,20 +1076,20 @@ const PropertyEdit = () => {
 
         <Column lg={8} md={8} sm={4}>
           <div style={{ padding: '1.5rem', backgroundColor: '#f4f4f4', borderRadius: '8px', height: 'fit-content' }}>
-            <h4 style={{ marginBottom: '1rem' }}>Property Preview</h4>
+            <h4 style={{ marginBottom: '1rem' }}>Vehicle Preview</h4>
             <div style={{ backgroundColor: 'white', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
-              <h5 style={{ margin: '0 0 0.5rem 0' }}>{formData.title || 'Property Title'}</h5>
+              <h5 style={{ margin: '0 0 0.5rem 0' }}>{formData.title || 'Vehicle Title'}</h5>
               <p style={{ margin: '0 0 0.5rem 0', color: '#666', fontSize: '0.875rem' }}>
                 {formData.area && formData.city ? `${formData.area}, ${formData.city}` : formData.city || 'Location'}
               </p>
               <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#0f62fe' }}>
-                ₦{formData.price ? parseInt(formData.price).toLocaleString() : '0'}/month
+                ₦{formData.price ? parseInt(formData.price).toLocaleString() : '0'}/day
               </p>
               <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#666' }}>
-                {formData.bedrooms && <span>{formData.bedrooms} bed</span>}
-                {formData.bathrooms && <span>{formData.bathrooms} bath</span>}
+                {formData.bedrooms && <span>{formData.bedrooms} seats</span>}
+                {formData.bathrooms && <span>{formData.bathrooms} doors</span>}
                 <span style={{ textTransform: 'capitalize' }}>{formData.property_type}</span>
-                {formData.furnished && <span>Furnished</span>}
+                {formData.furnished && <span>A/C</span>}
               </div>
             </div>
             
@@ -1104,22 +1106,22 @@ const PropertyEdit = () => {
   );
 };
 
-const PropertyViewings = () => {
+const VehicleBookings = () => {
   const { propertyId } = useParams();
-  const [property, setProperty] = useState(null);
-  const [viewings, setViewings] = useState([]);
+  const [vehicle, setVehicle] = useState(null);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user && propertyId) {
-      fetchProperty();
-      fetchViewings();
+      fetchVehicle();
+      fetchBookings();
     }
   }, [user, propertyId]);
 
-  const fetchProperty = async () => {
+  const fetchVehicle = async () => {
     try {
       const { data, error } = await supabase
         .from('properties')
@@ -1129,37 +1131,37 @@ const PropertyViewings = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching property:', error);
+        console.error('Error fetching vehicle:', error);
         navigate('/dashboard/listings');
         return;
       }
 
-      setProperty(data);
+      setVehicle(data);
     } catch (error) {
-      console.error('Error fetching property:', error);
+      console.error('Error fetching vehicle:', error);
       navigate('/dashboard/listings');
     }
   };
 
-  const fetchViewings = async () => {
+  const fetchBookings = async () => {
     try {
       const { data, error } = await supabase
         .from('property_views')
         .select(`
           *,
-          viewer:users!property_views_viewer_id_fkey(id, full_name, email)
+          renter:users!property_views_viewer_id_fkey(id, full_name, email)
         `)
         .eq('property_id', propertyId)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching viewings:', error);
+        console.error('Error fetching bookings:', error);
         return;
       }
 
-      setViewings(data || []);
+      setBookings(data || []);
     } catch (error) {
-      console.error('Error fetching viewings:', error);
+      console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
     }
@@ -1168,7 +1170,7 @@ const PropertyViewings = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <Loading description="Loading viewings..." />
+        <Loading description="Loading bookings..." />
       </div>
     );
   }
@@ -1177,19 +1179,19 @@ const PropertyViewings = () => {
     <div>
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2>Property Viewings</h2>
-          <p>{property?.title} - View history and manage inquiries</p>
+          <h2>Vehicle Bookings</h2>
+          <p>{vehicle?.title} - Booking history and inquiries</p>
         </div>
         <Button 
           kind="secondary"
           onClick={() => navigate('/dashboard/listings')}
         >
-          Back to Listings
+          Back to My Cars
         </Button>
       </div>
 
       <div style={{ marginBottom: '2rem' }}>
-        <h3>Viewing Statistics</h3>
+        <h3>Booking Statistics</h3>
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
@@ -1198,14 +1200,14 @@ const PropertyViewings = () => {
           <Tile style={{ textAlign: 'center' }}>
             <View size={32} style={{ marginBottom: '0.5rem', color: '#0f62fe' }} />
             <h4 style={{ margin: 0, fontSize: '1.5rem', color: '#0f62fe' }}>
-              {viewings.length}
+              {bookings.length}
             </h4>
-            <p style={{ margin: 0 }}>Total Views</p>
+            <p style={{ margin: 0 }}>Total Inquiries</p>
           </Tile>
           <Tile style={{ textAlign: 'center' }}>
             <Calendar size={32} style={{ marginBottom: '0.5rem', color: '#0f62fe' }} />
             <h4 style={{ margin: 0, fontSize: '1.5rem', color: '#0f62fe' }}>
-              {viewings.filter(v => {
+              {bookings.filter(v => {
                 const viewDate = new Date(v.created_at);
                 const weekAgo = new Date();
                 weekAgo.setDate(weekAgo.getDate() - 7);
@@ -1218,8 +1220,8 @@ const PropertyViewings = () => {
       </div>
 
       <div>
-        <h3>Recent Viewers</h3>
-        {viewings.length === 0 ? (
+        <h3>Recent Inquiries</h3>
+        {bookings.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
             padding: '3rem', 
@@ -1227,25 +1229,25 @@ const PropertyViewings = () => {
             borderRadius: '8px' 
           }}>
             <View size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-            <h4>No Views Yet</h4>
-            <p>Your property hasn't been viewed yet. Share the link to get more visibility!</p>
+            <h4>No Inquiries Yet</h4>
+            <p>Your vehicle hasn't received any rental inquiries yet. Share the link to get more visibility!</p>
           </div>
         ) : (
           <div>
-            {viewings.map(viewing => (
-              <Tile key={viewing.id} style={{ marginBottom: '1rem' }}>
+            {bookings.map(booking => (
+              <Tile key={booking.id} style={{ marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <h4 style={{ margin: 0, marginBottom: '4px' }}>
-                      {viewing.viewer?.full_name || viewing.viewer?.email || 'Anonymous'}
+                      {booking.renter?.full_name || booking.renter?.email || 'Anonymous'}
                     </h4>
                     <p style={{ margin: 0, fontSize: '0.875rem', color: '#666' }}>
-                      Viewed on {new Date(viewing.created_at).toLocaleDateString()}
+                      Inquired on {new Date(booking.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
                     <Button kind="ghost" size="sm">
-                      Contact Viewer
+                      Contact Renter
                     </Button>
                   </div>
                 </div>
@@ -1705,8 +1707,8 @@ const Messages = () => {
 
 const Applications = () => (
   <div>
-    <h2>Applications</h2>
-    <p>View and manage rental applications.</p>
+    <h2>Bookings</h2>
+    <p>View and manage rental bookings.</p>
     <div style={{ 
       textAlign: 'center', 
       padding: '3rem', 
@@ -1715,17 +1717,17 @@ const Applications = () => (
       marginTop: '2rem'
     }}>
       <Document size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-      <h3>Applications Management</h3>
-      <p>Application management functionality will be implemented here.</p>
-      <p>Users will be able to view and respond to rental applications.</p>
+      <h3>Bookings Management</h3>
+      <p>Booking management functionality will be implemented here.</p>
+      <p>Users will be able to view and respond to rental bookings.</p>
     </div>
   </div>
 );
 
 const Invoices = () => (
   <div>
-    <h2>Invoices</h2>
-    <p>View and manage your invoices and payments.</p>
+    <h2>Payments</h2>
+    <p>View and manage your rental payments and earnings.</p>
     <div style={{ 
       textAlign: 'center', 
       padding: '3rem', 
@@ -1736,7 +1738,7 @@ const Invoices = () => (
       <Receipt size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
       <h3>Invoice Management</h3>
       <p>Invoice and payment functionality will be implemented here.</p>
-      <p>Users will be able to track payments and generate invoices.</p>
+      <p>Users will be able to track rental payments and earnings.</p>
     </div>
   </div>
 );
@@ -1779,13 +1781,13 @@ const Dashboard = () => {
                 renderIcon={Building}
                 href="/dashboard/listings"
               >
-                My Listings
+                My Cars
               </SideNavLink>
               <SideNavLink 
                 renderIcon={Document}
                 href="/dashboard/applications"
               >
-                Applications
+                Bookings
               </SideNavLink>
               {/* Messages temporarily disabled
               <SideNavLink 
@@ -1799,7 +1801,7 @@ const Dashboard = () => {
                 renderIcon={Receipt}
                 href="/dashboard/invoices"
               >
-                Invoices
+                Payments
               </SideNavLink>
               {/* User Search temporarily disabled
               <div style={{ padding: '1rem', borderTop: '1px solid #e0e0e0', marginTop: '1rem' }}>
@@ -1823,8 +1825,8 @@ const Dashboard = () => {
             <Routes>
               <Route path="/" element={<DashboardHome />} />
               <Route path="/listings" element={<MyListings />} />
-              <Route path="/listings/edit/:propertyId" element={<PropertyEdit />} />
-              <Route path="/listings/viewings/:propertyId" element={<PropertyViewings />} />
+              <Route path="/listings/edit/:propertyId" element={<VehicleEdit />} />
+              <Route path="/listings/viewings/:propertyId" element={<VehicleBookings />} />
               <Route path="/applications" element={<Applications />} />
               {/* Messages route temporarily disabled */}
               {/* <Route path="/messages" element={<Messages />} /> */}

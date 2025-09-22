@@ -85,7 +85,7 @@ const Login = () => {
           textAlign: 'center',
           color: '#161616'
         }}>
-          Sign In to NG Rentals
+          Sign In to RYD
         </Heading>
         
         {error && (

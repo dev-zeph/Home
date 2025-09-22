@@ -98,7 +98,7 @@ const AppHeader = () => {
     navigate('/'); // Redirect to homepage after logout
   };
 
-  const handleSearchPropertiesClick = () => {
+  const handleSearchCarsClick = () => {
     // If we're not on the homepage, navigate there first
     if (window.location.pathname !== '/') {
       navigate('/', { state: { scrollToSearch: true } });
@@ -119,16 +119,16 @@ const AppHeader = () => {
   };
   return (
     <>
-      <Header aria-label="NG Rentals">
+      <Header aria-label="RYD Car Rentals">
         <HeaderName as={Link} to="/" prefix="">
-          Home.NG
+          RYD
         </HeaderName>
         <HeaderNavigation aria-label="Main Navigation">
           <HeaderMenuItem as={Link} to="/">
             Home
           </HeaderMenuItem>
-          <HeaderMenuItem onClick={handleSearchPropertiesClick} style={{cursor: 'pointer'}}>
-            Search Properties
+          <HeaderMenuItem onClick={handleSearchCarsClick} style={{cursor: 'pointer'}}>
+            Search Cars
           </HeaderMenuItem>
           {isAuthenticated && (
             <>
@@ -136,7 +136,7 @@ const AppHeader = () => {
                 Dashboard
               </HeaderMenuItem>
               <HeaderMenuItem as={Link} to="/post-property">
-                Post Property
+                List Your Car
               </HeaderMenuItem>
             </>
           )}

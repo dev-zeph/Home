@@ -30,7 +30,7 @@ const Signup = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'tenant'
+    role: 'renter'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -303,8 +303,8 @@ const Signup = () => {
               onChange={handleSelectChange}
               size="lg"
             >
-              <SelectItem value="tenant" text="Tenant - Looking for property to rent" />
-              <SelectItem value="owner" text="Property Owner - Want to list my property" />
+              <SelectItem value="renter" text="Renter - Looking for cars to rent" />
+              <SelectItem value="owner" text="Car Owner - Want to list my vehicle" />
             </Select>
             <div style={{ 
               padding: '1rem', 
@@ -317,9 +317,9 @@ const Signup = () => {
                 fontSize: '0.875rem', 
                 color: 'var(--cds-text-secondary)' 
               }}>
-                {formData.role === 'tenant' 
-                  ? '🏠 As a tenant, you can search properties, save favorites, and contact property owners.'
-                  : '🏢 As a property owner, you can list your properties, manage applications, and connect with potential tenants.'
+                {formData.role === 'renter' 
+                  ? '🚗 As a renter, you can search vehicles, save favorites, and book cars from verified owners.'
+                  : '🚙 As a car owner, you can list your vehicles, manage bookings, and earn money from rentals.'
                 }
               </p>
             </div>
@@ -374,7 +374,7 @@ const Signup = () => {
           <ToastNotification
             kind="success"
             title="Account Created Successfully!"
-            subtitle="Please check your email and click the confirmation link to activate your account. You can then sign in to NG Rentals."
+            subtitle="Please check your email and click the confirmation link to activate your account. You can then sign in to RYD."
             caption={new Date().toLocaleTimeString()}
             timeout={0}
             onCloseButtonClick={() => setShowToast(false)}
@@ -431,7 +431,7 @@ const Signup = () => {
                 color: 'var(--cds-text-primary)'
               }}
             >
-              Join NG Rentals
+              Join RYD
             </Heading>
             <p
               style={{

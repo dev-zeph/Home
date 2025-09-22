@@ -43,11 +43,11 @@ import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { supabase } from '../lib/supabase';
 
 const AdminDashboard = () => {
-  const [properties, setProperties] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalProperties, setTotalProperties] = useState(0);
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [totalVehicles, setTotalVehicles] = useState(0);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [rejectionModal, setRejectionModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [processingAction, setProcessingAction] = useState(null);
@@ -59,25 +59,25 @@ const AdminDashboard = () => {
   const { admin, signOut } = useAdminAuth();
   const navigate = useNavigate();
   
-  const propertiesPerPage = 10;
+  const vehiclesPerPage = 10;
 
   useEffect(() => {
     if (!admin) {
       navigate('/admin/login');
       return;
     }
-    fetchProperties();
+    fetchVehicles();
   }, [admin, currentPage, searchTerm, statusFilter, navigate]);
 
-  const fetchProperties = async () => {
+  const fetchVehicles = async () => {
     if (!admin) return;
     
     setLoading(true);
     try {
-      const startIndex = (currentPage - 1) * propertiesPerPage;
-      const endIndex = startIndex + propertiesPerPage - 1;
+      const startIndex = (currentPage - 1) * vehiclesPerPage;
+      const endIndex = startIndex + vehiclesPerPage - 1;
 
-      // Admin can see all properties - no RLS restriction in query
+      // Admin can see all vehicles - no RLS restriction in query
       let query = supabase
         .from('properties')
         .select(`
@@ -111,26 +111,26 @@ const AdminDashboard = () => {
         setNotification({
           kind: 'error',
           title: 'Error',
-          subtitle: 'Failed to fetch properties: ' + error.message
+          subtitle: 'Failed to fetch vehicles: ' + error.message
         });
         return;
       }
 
-      setProperties(data || []);
-      setTotalProperties(count || 0);
+      setVehicles(data || []);
+      setTotalVehicles(count || 0);
     } catch (error) {
-      console.error('Error fetching properties:', error);
+      console.error('Error fetching vehicles:', error);
       setNotification({
         kind: 'error',
         title: 'Error',
-        subtitle: 'An unexpected error occurred while fetching properties'
+        subtitle: 'An unexpected error occurred while fetching vehicles'
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerifyProperty = async (propertyId) => {
+  const handleVerifyVehicle = async (propertyId) => {
     setProcessingAction(propertyId);
     try {
       const { error } = await supabase
@@ -143,11 +143,11 @@ const AdminDashboard = () => {
         .eq('id', propertyId);
 
       if (error) {
-        console.error('Error verifying property:', error);
+        console.error('Error verifying vehicle:', error);
         setNotification({
           kind: 'error',
           title: 'Error',
-          subtitle: 'Failed to verify property'
+          subtitle: 'Failed to verify vehicle'
         });
         return;
       }
@@ -155,13 +155,13 @@ const AdminDashboard = () => {
       setNotification({
         kind: 'success',
         title: 'Success',
-        subtitle: 'Property has been verified and is now live'
+        subtitle: 'Vehicle has been verified and is now live'
       });
 
-      // Refresh properties
-      await fetchProperties();
+      // Refresh vehicles
+      await fetchVehicles();
     } catch (error) {
-      console.error('Error verifying property:', error);
+      console.error('Error verifying vehicle:', error);
       setNotification({
         kind: 'error',
         title: 'Error',
@@ -172,8 +172,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRejectProperty = async () => {
-    if (!selectedProperty || !rejectionReason.trim()) {
+  const handleRejectVehicle = async () => {
+    if (!selectedVehicle || !rejectionReason.trim()) {
       setNotification({
         kind: 'error',
         title: 'Error',
@@ -182,9 +182,9 @@ const AdminDashboard = () => {
       return;
     }
 
-    setProcessingAction(selectedProperty.id);
+    setProcessingAction(selectedVehicle.id);
     try {
-      // Update property status
+      // Update vehicle status
       const { error: updateError } = await supabase
         .from('properties')
         .update({ 
@@ -192,41 +192,41 @@ const AdminDashboard = () => {
           status: 'inactive',
           updated_at: new Date().toISOString() 
         })
-        .eq('id', selectedProperty.id);
+        .eq('id', selectedVehicle.id);
 
       if (updateError) {
         console.error('Error rejecting property:', updateError);
         setNotification({
           kind: 'error',
           title: 'Error',
-          subtitle: 'Failed to reject property'
+          subtitle: 'Failed to reject vehicle'
         });
         return;
       }
 
-      // Here you would typically send an email to the property owner
+      // Here you would typically send an email to the vehicle owner
       // For now, we'll just log the rejection reason
-      console.log('Property rejected:', {
-        propertyId: selectedProperty.id,
-        ownerEmail: selectedProperty.owner?.email,
+      console.log('Vehicle rejected:', {
+        propertyId: selectedVehicle.id,
+        ownerEmail: selectedVehicle.owner?.email,
         reason: rejectionReason
       });
 
       setNotification({
         kind: 'success',
         title: 'Success',
-        subtitle: 'Property has been rejected. Owner will be notified via email.'
+        subtitle: 'Vehicle has been rejected. Owner will be notified via email.'
       });
 
       // Close modal and reset
       setRejectionModal(false);
-      setSelectedProperty(null);
+      setSelectedVehicle(null);
       setRejectionReason('');
 
-      // Refresh properties
-      await fetchProperties();
+      // Refresh vehicles
+      await fetchVehicles();
     } catch (error) {
-      console.error('Error rejecting property:', error);
+      console.error('Error rejecting vehicle:', error);
       setNotification({
         kind: 'error',
         title: 'Error',
@@ -237,11 +237,11 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleEmailOwner = (property) => {
-    const subject = `Regarding your property listing: ${property.title}`;
-    const body = `Dear ${property.owner?.display_name || 'Property Owner'},\n\nI hope this email finds you well. I am writing regarding your property listing "${property.title}" on NG Rentals.\n\n[Please provide your message here]\n\nBest regards,\nNG Rentals Admin Team`;
+  const handleEmailOwner = (vehicle) => {
+    const subject = `Regarding your vehicle listing: ${vehicle.title}`;
+    const body = `Dear ${vehicle.owner?.display_name || 'Vehicle Owner'},\n\nI hope this email finds you well. I am writing regarding your vehicle listing "${vehicle.title}" on RYD.\n\n[Please provide your message here]\n\nBest regards,\nRYD Admin Team`;
     
-    const mailtoUrl = `mailto:${property.owner?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:${vehicle.owner?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl);
   };
 
@@ -253,12 +253,12 @@ const AdminDashboard = () => {
     }).format(price);
   };
 
-  const getStatusTag = (property) => {
-    if (property.verified) {
+  const getStatusTag = (vehicle) => {
+    if (vehicle.verified) {
       return <Tag type="green">Verified</Tag>;
-    } else if (property.status === 'pending') {
+    } else if (vehicle.status === 'pending') {
       return <Tag type="yellow">Pending Review</Tag>;
-    } else if (property.status === 'inactive') {
+    } else if (vehicle.status === 'inactive') {
       return <Tag type="red">Rejected</Tag>;
     } else {
       return <Tag type="gray">Unverified</Tag>;
@@ -266,12 +266,12 @@ const AdminDashboard = () => {
   };
 
   const getDashboardStats = () => {
-    const totalProps = properties.length;
-    const verified = properties.filter(p => p.verified).length;
-    const pending = properties.filter(p => !p.verified && p.status === 'pending').length;
-    const rejected = properties.filter(p => p.status === 'inactive').length;
+    const totalVehicles = vehicles.length;
+    const verified = vehicles.filter(p => p.verified).length;
+    const pending = vehicles.filter(p => !p.verified && p.status === 'pending').length;
+    const rejected = vehicles.filter(p => p.status === 'inactive').length;
 
-    return { totalProps, verified, pending, rejected };
+    return { totalVehicles, verified, pending, rejected };
   };
 
   const stats = getDashboardStats();
@@ -286,21 +286,21 @@ const AdminDashboard = () => {
 
   const headers = [
     { key: 'image', header: 'Image' },
-    { key: 'title', header: 'Property Title' },
+    { key: 'title', header: 'Vehicle Title' },
     { key: 'owner', header: 'Owner' },
     { key: 'location', header: 'Location' },
-    { key: 'price', header: 'Price' },
+    { key: 'price', header: 'Daily Rate' },
     { key: 'status', header: 'Status' },
     { key: 'created', header: 'Created' },
     { key: 'actions', header: 'Actions' }
   ];
 
-  const tableData = properties.map((property) => ({
-    id: property.id,
+  const tableData = vehicles.map((vehicle) => ({
+    id: vehicle.id,
     image: (
       <img 
-        src={property.property_media?.[0]?.url || '/placeholder-property.jpg'} 
-        alt={property.title}
+        src={vehicle.property_media?.[0]?.url || '/placeholder-vehicle.jpg'} 
+        alt={vehicle.title}
         style={{ 
           width: '60px', 
           height: '40px', 
@@ -312,69 +312,69 @@ const AdminDashboard = () => {
     title: (
       <div>
         <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-          {property.title}
+          {vehicle.title}
         </div>
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
-          {property.property_type} • {property.bedrooms || 0} bed • {property.bathrooms || 0} bath
+          {vehicle.property_type} • {vehicle.bedrooms || 0} seats • {vehicle.bathrooms || 0} doors
         </div>
       </div>
     ),
     owner: (
       <div>
         <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-          {property.owner?.display_name || 'Unknown'}
+          {vehicle.owner?.display_name || 'Unknown'}
         </div>
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
-          {property.owner?.email}
+          {vehicle.owner?.email}
         </div>
       </div>
     ),
     location: (
       <div>
         <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-          {property.city}
+          {vehicle.city}
         </div>
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
-          {property.area}
+          {vehicle.area}
         </div>
       </div>
     ),
-    price: formatPrice(property.price),
-    status: getStatusTag(property),
-    created: new Date(property.created_at).toLocaleDateString(),
+    price: formatPrice(vehicle.price),
+    status: getStatusTag(vehicle),
+    created: new Date(vehicle.created_at).toLocaleDateString(),
     actions: (
       <div style={{ display: 'flex', gap: '8px' }}>
         <IconButton
           kind="ghost"
           size="sm"
-          label="View Property"
-          onClick={() => window.open(`/property/${property.id}`, '_blank')}
+          label="View Vehicle"
+          onClick={() => window.open(`/property/${vehicle.id}`, '_blank')}
         >
           <View size={16} />
         </IconButton>
         
-        {!property.verified && property.status !== 'inactive' && (
+        {!vehicle.verified && vehicle.status !== 'inactive' && (
           <IconButton
             kind="primary"
             size="sm"
-            label="Verify Property"
-            onClick={() => handleVerifyProperty(property.id)}
-            disabled={processingAction === property.id}
+            label="Verify Vehicle"
+            onClick={() => handleVerifyVehicle(vehicle.id)}
+            disabled={processingAction === vehicle.id}
           >
             <CheckmarkFilled size={16} />
           </IconButton>
         )}
         
-        {property.verified || property.status !== 'inactive' ? (
+        {vehicle.verified || vehicle.status !== 'inactive' ? (
           <IconButton
             kind="danger"
             size="sm"
-            label="Reject Property"
+            label="Reject Vehicle"
             onClick={() => {
-              setSelectedProperty(property);
+              setSelectedVehicle(vehicle);
               setRejectionModal(true);
             }}
-            disabled={processingAction === property.id}
+            disabled={processingAction === vehicle.id}
           >
             <CloseFilled size={16} />
           </IconButton>
@@ -384,7 +384,7 @@ const AdminDashboard = () => {
           kind="secondary"
           size="sm"
           label="Email Owner"
-          onClick={() => handleEmailOwner(property)}
+          onClick={() => handleEmailOwner(vehicle)}
         >
           <Email size={16} />
         </IconButton>
@@ -407,7 +407,7 @@ const AdminDashboard = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <UserAdmin size={32} style={{ color: '#0f62fe' }} />
           <div>
-            <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
+            <h2 style={{ margin: 0 }}>RYD Admin Dashboard</h2>
             <p style={{ margin: 0, color: '#666' }}>
               Welcome back, {admin?.email} • Session auto-expires in 30 minutes
             </p>
@@ -442,9 +442,9 @@ const AdminDashboard = () => {
         <Tile style={{ textAlign: 'center' }}>
           <Building size={32} style={{ marginBottom: '0.5rem', color: '#0f62fe' }} />
           <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#0f62fe' }}>
-            {totalProperties}
+            {totalVehicles}
           </h3>
-          <p style={{ margin: 0 }}>Total Properties</p>
+          <p style={{ margin: 0 }}>Total Vehicles</p>
         </Tile>
         
         <Tile style={{ textAlign: 'center' }}>
@@ -481,7 +481,7 @@ const AdminDashboard = () => {
         flexWrap: 'wrap'
       }}>
         <Search
-          placeholder="Search properties..."
+          placeholder="Search vehicles..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ flexGrow: 1, minWidth: '300px' }}
@@ -491,7 +491,7 @@ const AdminDashboard = () => {
           id="status-filter"
           label="Filter by Status"
           items={[
-            { id: 'all', text: 'All Properties' },
+            { id: 'all', text: 'All Vehicles' },
             { id: 'pending', text: 'Pending Review' },
             { id: 'verified', text: 'Verified' },
             { id: 'unverified', text: 'Unverified' },
@@ -502,8 +502,8 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* Properties Table */}
-      {properties.length === 0 ? (
+      {/* Vehicles Table */}
+      {vehicles.length === 0 ? (
         <div style={{ 
           textAlign: 'center', 
           padding: '3rem', 
@@ -511,8 +511,8 @@ const AdminDashboard = () => {
           borderRadius: '8px' 
         }}>
           <Building size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-          <h3>No Properties Found</h3>
-          <p>No properties match your current filters.</p>
+          <h3>No Vehicles Found</h3>
+          <p>No vehicles match your current filters.</p>
         </div>
       ) : (
         <>
@@ -547,12 +547,12 @@ const AdminDashboard = () => {
             )}
           />
 
-          {totalProperties > propertiesPerPage && (
+          {totalVehicles > vehiclesPerPage && (
             <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
               <Pagination
                 page={currentPage}
-                totalItems={totalProperties}
-                pageSize={propertiesPerPage}
+                totalItems={totalVehicles}
+                pageSize={vehiclesPerPage}
                 pageSizes={[10, 20, 50]}
                 onChange={({ page }) => setCurrentPage(page)}
               />
@@ -566,30 +566,30 @@ const AdminDashboard = () => {
         open={rejectionModal}
         onRequestClose={() => {
           setRejectionModal(false);
-          setSelectedProperty(null);
+          setSelectedVehicle(null);
           setRejectionReason('');
         }}
-        modalHeading="Reject Property"
-        modalLabel="Property Verification"
+        modalHeading="Reject Vehicle"
+        modalLabel="Vehicle Verification"
         primaryButtonText="Send Rejection"
         secondaryButtonText="Cancel"
-        onRequestSubmit={handleRejectProperty}
+        onRequestSubmit={handleRejectVehicle}
         primaryButtonDisabled={!rejectionReason.trim() || processingAction}
       >
         <div style={{ marginBottom: '1rem' }}>
           <p>
-            You are about to reject the property "<strong>{selectedProperty?.title}</strong>" 
-            by {selectedProperty?.owner?.display_name || selectedProperty?.owner?.email}.
+            You are about to reject the vehicle "<strong>{selectedVehicle?.title}</strong>" 
+            by {selectedVehicle?.owner?.display_name || selectedVehicle?.owner?.email}.
           </p>
           <p>
-            Please provide a detailed reason for rejection. This message will be sent to the property owner.
+            Please provide a detailed reason for rejection. This message will be sent to the vehicle owner.
           </p>
         </div>
         
         <TextArea
           id="rejection-reason"
           labelText="Reason for Rejection *"
-          placeholder="Please provide a clear explanation of why this property cannot be approved. Include specific issues and how they can be resolved."
+          placeholder="Please provide a clear explanation of why this vehicle cannot be approved. Include specific issues and how they can be resolved."
           value={rejectionReason}
           onChange={(e) => setRejectionReason(e.target.value)}
           rows={6}

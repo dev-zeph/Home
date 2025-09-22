@@ -33,8 +33,8 @@ const Home = () => {
     maxPrice: '',
     propertyType: '',
     listingType: '',
-    beds: '',
-    baths: ''
+    seats: '',
+    fuelType: ''
   });
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,16 +147,16 @@ const Home = () => {
             onClick={scrollToSearch}
             className="search-properties-btn"
           >
-            Search Properties
+            Search ryds
           </Button>
         </Column>
 
         {/* Post Property CTA for Authenticated Users */}
         {isAuthenticated && (
           <Column lg={16} md={8} sm={4} style={{ padding: '2rem 1rem', textAlign: 'center', backgroundColor: '#e8f4fd' }}>
-            <h3 style={{ marginBottom: '1rem' }}>Have a property to rent?</h3>
+            <h3 style={{ marginBottom: '1rem' }}>Have a car to rent out?</h3>
             <p style={{ marginBottom: '1.5rem', color: '#525252' }}>
-              List your property on NG Rentals and reach thousands of potential tenants.
+              List your vehicle on RYD and earn money from thousands of potential renters.
             </p>
             <Button 
               as={Link}
@@ -164,7 +164,7 @@ const Home = () => {
               renderIcon={Add}
               size="lg"
             >
-              Post Your Property
+              List Your Car
             </Button>
           </Column>
         )}
@@ -190,12 +190,12 @@ const Home = () => {
         {/* Rest Assured Section */}
         <Column lg={16} md={8} sm={4} className="rest-assured-section">
           <div className="rest-assured-content">
-            <h2>Rest Assured</h2>
+            <h2>Drive with Confidence</h2>
             <p>
-              Every property listed on NG Rentals undergoes thorough physical verification by our 
-              professional home.ng agents. We personally visit each property to ensure accurate 
-              descriptions, verify amenities, and confirm the legitimacy of listings. Your safety 
-              and trust are our top priorities, so you can browse and apply with complete confidence.
+              Every vehicle listed on RYD undergoes thorough inspection and verification by our 
+              professional team. We personally inspect each car to ensure accurate descriptions, 
+              verify safety features, and confirm the legitimacy of all listings. Your safety 
+              and peace of mind are our top priorities, so you can rent and drive with complete confidence.
             </p>
           </div>
         </Column>
@@ -204,7 +204,7 @@ const Home = () => {
         <Column lg={16} md={8} sm={4} className="explore-nigeria-section">
           <div className="explore-nigeria-content">
             <h2>Explore Nigeria</h2>
-            <p>Discover amazing rental properties in Nigeria's most vibrant cities</p>
+            <p>Discover amazing car rental opportunities in Nigeria's most vibrant cities</p>
             
             <div className="cities-grid">
               <Link to="/cities/lagos" className="city-card">
@@ -270,9 +270,9 @@ const Home = () => {
           </div>
         </Column>
 
-        {/* Search Properties Section */}
+        {/* Search Cars Section */}
         <Column lg={16} md={8} sm={4} id="search-section" className="search-properties-section">
-          <h2>Find Your Perfect Property</h2>
+          <h2>Find Your Perfect Car</h2>
           
           <Grid className="search-content" fullWidth>
             {/* Search and Filters */}
@@ -302,47 +302,47 @@ const Home = () => {
 
                 <Select
                   id="type-select"
-                  labelText="Property Type"
+                  labelText="Vehicle Type"
                   value={filters.propertyType}
                   onChange={(e) => setFilters({...filters, propertyType: e.target.value})}
                 >
                   <SelectItem value="" text="All Types" />
-                  <SelectItem value="apartment" text="Apartment" />
-                  <SelectItem value="house" text="House" />
-                  <SelectItem value="shared" text="Shared Space" />
-                  <SelectItem value="land" text="Land" />
-                  <SelectItem value="office" text="Office Space" />
-                  <SelectItem value="warehouse" text="Warehouse" />
-                  <SelectItem value="shop" text="Shop/Commercial" />
+                  <SelectItem value="economy" text="Economy" />
+                  <SelectItem value="suv" text="SUV" />
+                  <SelectItem value="luxury" text="Luxury" />
+                  <SelectItem value="sedan" text="Sedan" />
+                  <SelectItem value="pickup" text="Pickup Truck" />
+                  <SelectItem value="van" text="Van/Minibus" />
+                  <SelectItem value="convertible" text="Convertible" />
                 </Select>
 
                 <Select
-                  id="listing-type-select"
-                  labelText="Listing Type"
+                  id="transmission-select"
+                  labelText="Transmission"
                   value={filters.listingType || ''}
                   onChange={(e) => setFilters({...filters, listingType: e.target.value})}
                 >
-                  <SelectItem value="" text="All Listings" />
-                  <SelectItem value="rent" text="For Rent" />
-                  <SelectItem value="sale" text="For Sale" />
+                  <SelectItem value="" text="All Transmissions" />
+                  <SelectItem value="manual" text="Manual" />
+                  <SelectItem value="automatic" text="Automatic" />
                 </Select>
 
                 <NumberInput
                   id="min-price"
-                  label="Min Price (NGN)"
+                  label="Min Daily Rate (NGN)"
                   value={filters.minPrice}
                   onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
                   min={0}
-                  step={100000}
+                  step={5000}
                 />
 
                 <NumberInput
                   id="max-price"
-                  label="Max Price (NGN)"
+                  label="Max Daily Rate (NGN)"
                   value={filters.maxPrice}
                   onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
                   min={0}
-                  step={100000}
+                  step={5000}
                 />
 
                 <Button 
@@ -366,10 +366,10 @@ const Home = () => {
                 )}
                 
                 {loading ? (
-                  <Loading description="Loading properties..." />
+                  <Loading description="Loading vehicles..." />
                 ) : (
                   <>
-                    <p>{properties.length} properties found</p>
+                    <p>{properties.length} vehicles found</p>
                     
                     <div className="listings-grid">
                       {properties.map((property) => (
@@ -394,18 +394,18 @@ const Home = () => {
                             <h4>{property.title}</h4>
                             <p className="listing-price">
                               <Currency size={16} />
-                              {formatPrice(property.price)}{property.listing_type === 'rent' ? '/month' : ''}
+                              {formatPrice(property.price)}/day
                             </p>
                             <p className="listing-location">
                               <Location size={16} />
                               {property.city}, {property.state}
                             </p>
                             <div className="listing-details">
-                              <span>{property.bedrooms} beds</span>
-                              <span>{property.bathrooms} baths</span>
+                              <span>{property.bedrooms || 5} seats</span>
+                              <span>{property.bathrooms === 1 ? 'Manual' : 'Auto'}</span>
                               <span>{property.property_type}</span>
-                              <Tag type={property.listing_type === 'rent' ? 'blue' : 'purple'} size="sm">
-                                {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                              <Tag type="blue" size="sm">
+                                Available
                               </Tag>
                             </div>
                           </div>
@@ -414,7 +414,7 @@ const Home = () => {
                       
                       {properties.length === 0 && !loading && (
                         <div className="no-results">
-                          <p>No properties found. Try adjusting your search criteria.</p>
+                          <p>No vehicles found. Try adjusting your search criteria.</p>
                         </div>
                       )}
                     </div>
